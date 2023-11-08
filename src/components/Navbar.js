@@ -1,63 +1,59 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { IoMenu } from "react-icons/io5";
 
 const Navbar = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   return (
-    <nav className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-8">
-          <Link to="/" className="text-white font-bold">
+    <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
+      <Link to="/" className="p-2 mr-4 inline-flex items-center">
+        <span className="text-xl text-white font-bold uppercase tracking-wide">
+          Speed-Delivery
+        </span>
+      </Link>
+      <button
+        className="text-white inline-flex p-3 hover:bg-gray-900 rounded lg:hidden ml-auto hover:text-white outline-none"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+      >
+        <IoMenu className="h-5 w-5" />
+      </button>
+      <div
+        className={`${
+          isMenuOpen ? "flex" : "hidden"
+        } top-navbar w-full lg:inline-flex lg:flex-grow lg:w-auto`}
+      >
+        <div className="lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto">
+          <Link
+            to="/"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
             Home
           </Link>
-          <Link to="/parcel-history" className="text-white">
+          <Link
+            to="/parcel-history"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
             Parcel History
           </Link>
-          <Link to="/send-parcel" className="text-white">
+          <Link
+            to="/send-parcel"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
             Send a New Parcel
           </Link>
-          <Link to="/notifications" className="text-white">
+          <Link
+            to="/notifications"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
             Notifications
           </Link>
-          <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="text-white focus:outline-none"
-            >
-              User Profile
-              <i className="fas fa-caret-down ml-1"></i>
-            </button>
-            {showDropdown && (
-              <div className="absolute top-full px-2 py-2  bg-white shadow-md rounded-md">
-                <Link to="/login" className="block p-1 text-gray-800">
-                  Login
-                </Link>
-                <Link to="/logout" className="block p-1 text-gray-800">
-                  Logout
-                </Link>
-                <Link
-                  to="/account-settings"
-                  className="block p-1 text-gray-800"
-                >
-                  Settings
-                </Link>
-
-                <Link to="/delete-account" className="block p-1 text-gray-800">
-                  Delete Account
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <h5>Speedy Delivery</h5>
-          </div>
+          <Link
+            to="/contact"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
+            Profile
+          </Link>
         </div>
       </div>
     </nav>
