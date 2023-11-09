@@ -12,6 +12,7 @@ import Notifications from "./components/Notifications";
 import ParcelHistory from "./components/ParcelHistory";
 import SendParcel from "./components/sendparcel/SendParcel";
 import UserProfile from "./components/UserProfile";
+import Footer from "./components/Footer";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
       <div>
         <Navbar />
         <Outlet /> {/* This is where the nested routes will be rendered */}
+      
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/parcel-history" element={<ParcelHistory />} />
@@ -27,7 +29,9 @@ const App = () => {
           <Route path="/user-profile" element={<UserProfile />} />
         </Routes>
       </div>
+      <Footer/>
     </Router>
+    
   );
 };
 
