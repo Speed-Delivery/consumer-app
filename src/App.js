@@ -13,6 +13,7 @@ import ParcelHistory from "./components/ParcelHistory";
 import SendParcel from "./components/sendparcel/SendParcel";
 import UserProfile from "./components/UserProfile";
 import Footer from "./components/Footer";
+import SignIn from "./components/SignIn";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/send-parcel" element={<SendParcel />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/user-profile" element={<UserProfile />} />
+          <Route path="/sign-in" element={<SignIn/>} />
         </Routes>
       </div>
       <Footer/>
