@@ -40,7 +40,6 @@ const SendParcel = () => {
                   required
                   type="number"
                   name="width"
-                  value={parcelInfo.width}
                   onChange={handleChange}
                 />
               </div>
@@ -52,7 +51,6 @@ const SendParcel = () => {
                   type="number"
                   id="height"
                   name="height"
-                  value={parcelInfo.height}
                   onChange={handleChange}
                 />
               </div>
@@ -65,7 +63,6 @@ const SendParcel = () => {
                   type="number"
                   id="depth"
                   name="depth"
-                  value={parcelInfo.depth}
                   onChange={handleChange}
                 />
               </div>
@@ -77,7 +74,6 @@ const SendParcel = () => {
                   type="number"
                   id="mass"
                   name="mass"
-                  value={parcelInfo.mass}
                   onChange={handleChange}
                 />
               </div>
@@ -87,10 +83,9 @@ const SendParcel = () => {
                 <span className="mb-2 block text-md">Sender ID</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
-                  type="number"
+                  type="text"
                   id="depth"
                   name="depth"
-                  value={parcelInfo.depth}
                   onChange={handleChange}
                 />
               </div>
@@ -102,7 +97,6 @@ const SendParcel = () => {
                   type="text"
                   id="mass"
                   name="mass"
-                  value={parcelInfo.mass}
                   onChange={handleChange}
                 />
               </div>
