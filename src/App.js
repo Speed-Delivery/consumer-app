@@ -6,13 +6,13 @@ import {
   Routes,
   Outlet,
 } from "react-router-dom";
-import Home from "./Home";
-import Navbar from "./components/Navbar";
-import Notifications from "./components/Notifications";
-import ParcelHistory from "./components/ParcelHistory";
-import SendParcel from "./components/sendparcel/SendParcel";
+import Home from "./pages/Home";
+import Navbar from "./components/common/Navbar";
+import Notifications from "./components/notifications/Notification";
+import ParcelHistory from "./components/history/ParcelHistory";
+import SendParcel from "./components/parcels/SendParcel";
 import UserProfile from "./components/UserProfile";
-import Footer from "./components/Footer";
+import Footer from "./components/common/Footer";
 
 const App = () => {
   return (

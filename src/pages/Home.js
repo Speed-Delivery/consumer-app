@@ -1,5 +1,5 @@
 import React from "react";
-import Locker from "./components/sendparcel/Locker";
+import Locker from "../components/lockers/Locker";
 
 const Home = () => {
   const lockerCount = 15;
