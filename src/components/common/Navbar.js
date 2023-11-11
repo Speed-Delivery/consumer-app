@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 
-const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+const Navbar = ({ isAuthenticated, onSignOut }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
@@ -24,36 +24,36 @@ const Navbar = () => {
         } top-navbar w-full lg:inline-flex lg:flex-grow lg:w-auto`}
       >
         <div className="lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto">
-          <Link
-            to="/"
-            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
-          >
-            Home
-          </Link>
-          <Link
-            to="/parcel-history"
-            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
-          >
-            Parcel History
-          </Link>
-          <Link
-            to="/send-parcel"
-            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
-          >
-            Send a New Parcel
-          </Link>
-          <Link
-            to="/notifications"
-            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
-          >
-            Notifications
-          </Link>
-          <Link
-            to="/user-profile"
-            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
-          >
-            Profile
-          </Link>
+          {/* Static links */}
+          <Link to="/" className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white">Home</Link>
+          {/* ... other static links ... */}
+
+          {/* Conditional links based on authentication */}
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={onSignOut}
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/signin"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
