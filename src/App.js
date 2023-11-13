@@ -33,7 +33,7 @@ const App = () => {
       </div>
       <Footer/>
     </Router>
-    
+
   );
 };
 
