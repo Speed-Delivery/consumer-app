@@ -23,7 +23,7 @@ const App = () => {
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://172.104.151.10:5000/api/user/signup", {
+      const response = await fetch("http://localhost:5000/api/user/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,8 +35,11 @@ const App = () => {
         const data = await response.json();
         console.log(data);
         setIsAuthenticated(true);
+      }else if (response.status === 409) {
+        console.error("User already exists.");
+        console.log(response.status);
       } else {
-        console.error("Login failed.");
+        console.error("Login failed.", response.status);
       } 
     } catch (err) {
       console.error("There was an error.", err);
@@ -46,7 +49,7 @@ const App = () => {
   // Define the onSignup function
   const onSignup = async (formData) => {
     try {
-      const response = await fetch('http://172.104.151.10:5000/api/user/signup', {
+      const response = await fetch('http://localhost:5000/api/user/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
