@@ -29,19 +29,57 @@ const Navbar = ({ isAuthenticated, onSignOut }) => {
       >
         <div className="lg:inline-flex lg:flex-row lg:ml-auto lg:w-auto w-full lg:items-center items-start flex flex-col lg:h-auto">
           {/* Static links */}
-          <Link to="/" className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white">Home</Link>
+          <Link
+            to="/"
+            className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+          >
+            Home
+          </Link>
           {/* ... other static links ... */}
 
-          {/* Conditional links based on authentication */}
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <>
+              <Link
+                to="/notifications"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Notifications
+              </Link>
+              <Link
+                to="/send-parcel"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Send Parcel
+              </Link>
+              <Link
+                to="/parcel-history"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Parcel History
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
               >
                 Sign Out
               </button>
+              <Link
+                to="/user-profile"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+                Profile
+              </Link>
             </>
+          )}
+
+
+          {isAuthenticated ? (
+            <button
+              onClick={onSignOut}
+              className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+            >
+              Sign Out
+            </button>
           ) : (
             <>
               <Link
