@@ -1,5 +1,5 @@
 // App.js
-import React,  { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -20,10 +20,21 @@ import Signup from "./components/user/Signup";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const storedAuth = JSON.parse(localStorage.getItem("isAuthenticated"));
+
+    if (storedUser && storedAuth) {
+      setUser(storedUser);
+      setIsAuthenticated(storedAuth);
+    }
+  }, []);
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://172.104.151.10:5000/api/user/signup", {
+      const response = await fetch("http://localhost:5005/api/user/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,10 +45,16 @@ const App = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
+        // console.log(credentials);
+        setUser(credentials);
         setIsAuthenticated(true);
+
+        // Store user data and authentication status in localStorage
+        localStorage.setItem("user", JSON.stringify(credentials));
+        localStorage.setItem("isAuthenticated", JSON.stringify(true));
       } else {
         console.error("Login failed.");
-      } 
+      }
     } catch (err) {
       console.error("There was an error.", err);
     }
@@ -46,26 +63,33 @@ const App = () => {
   // Define the onSignup function
   const onSignup = async (formData) => {
     try {
-      const response = await fetch('http://172.104.151.10:5000/api/user/signup', {
+      const response = await fetch('http://localhost:5005/api/user/signup', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         const data = await response.json();
         // Handle successful signup, perhaps automatically logging in the user
-        console.log('Signup successful!', data);
+        console.log("Signup successful!", data);
+        console.log(formData);
         setIsAuthenticated(true);
+
+        setUser(formData);
+
+        // Store user data and authentication status in localStorage
+        localStorage.setItem("user", JSON.stringify(formData));
+        localStorage.setItem("isAuthenticated", JSON.stringify(true));
         // Again, you might want to store the token or user data
       } else {
         // Handle errors, such as displaying a message to the user
-        console.error('Signup failed');
+        console.error("Signup failed");
       }
     } catch (error) {
-      console.error('There was an error signing up', error);
+      console.error("There was an error signing up", error);
     }
   };
 
@@ -73,15 +97,39 @@ const App = () => {
     setIsAuthenticated(false);
     // Perform any clean-up or state reset actions
     // Clean up authentication state, remove token, etc.
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthenticated");
   };
 
   return (
     <Router>
-      <Navbar isAuthenticated={isAuthenticated} onSignOut={() => setIsAuthenticated(false)} />
+      <Navbar
+        user={user}
+        isAuthenticated={isAuthenticated}
+        onSignOut={handleSignOut}
+      />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/signin" element={!isAuthenticated ? <Login onAuthenticated={handleLogin} /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!isAuthenticated ? <Signup onSignup={onSignup} /> : <Navigate to="/" />} />
+        <Route
+          path="/signin"
+          element={
+            !isAuthenticated ? (
+              <Login onAuthenticated={handleLogin} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            !isAuthenticated ? (
+              <Signup onSignup={onSignup} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
         {isAuthenticated && (
           <>
             <Route path="/user-profile" element={<UserProfile />} />
