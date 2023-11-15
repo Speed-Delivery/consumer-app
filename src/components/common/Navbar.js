@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 
-<<<<<<< HEAD
 const Navbar = ({ isAuthenticated, onSignOut, user }) => {
 const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,11 +10,6 @@ const navigate = useNavigate();
     onSignOut();
     navigate('/signin');
 };
-=======
-const Navbar = ({ isAuthenticated, onSignOut }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
->>>>>>> main
   return (
     <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
       <Link to="/" className="p-2 mr-4 inline-flex items-center">
