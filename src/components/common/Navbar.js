@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 
 const Navbar = ({ isAuthenticated, onSignOut, user }) => {
+const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   console.log(user, "this is user");
-
+  const  handleSignOut = () => {
+    onSignOut();
+    navigate('/signin');
+};
   return (
     <nav className="flex items-center bg-gray-800 p-3 flex-wrap">
       <Link to="/" className="p-2 mr-4 inline-flex items-center">
@@ -67,7 +71,7 @@ const Navbar = ({ isAuthenticated, onSignOut, user }) => {
           {isAuthenticated ? (
             <>
               <button
-                onClick={onSignOut}
+                onClick={handleSignOut}
                 className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
               >
                 Sign Out

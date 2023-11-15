@@ -34,7 +34,7 @@ const App = () => {
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://localhost:8001/api/user/signin", {
+      const response = await fetch("http://localhost:5000/api/user/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,8 +63,8 @@ const App = () => {
   // Define the onSignup function
   const onSignup = async (formData) => {
     try {
-      const response = await fetch("http://localhost:8001/api/user/signup", {
-        method: "POST",
+      const response = await fetch('http://localhost:5000/api/user/signup', {
+        method: 'POST',
         headers: {
           "Content-Type": "application/json",
         },
