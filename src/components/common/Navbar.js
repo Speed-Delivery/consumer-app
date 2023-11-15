@@ -39,7 +39,6 @@ const navigate = useNavigate();
           {/* ... other static links ... */}
 
           {isAuthenticated && (
-<<<<<<< HEAD
             <>
               <Link
                 to="/notifications"
@@ -70,8 +69,6 @@ const navigate = useNavigate();
           )}
 
           {isAuthenticated ? (
-=======
->>>>>>> main
             <>
               <Link
                 to="/notifications"
