@@ -17,6 +17,7 @@ import Footer from "./components/common/Footer";
 import Login from "./components/user/Login";
 import AdminPanel from "./components/user/AdminPanel";
 import Signup from "./components/user/Signup";
+import EditUserProfile from "./components/EditUserProfile";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -83,6 +84,7 @@ const App = () => {
         // Store user data and authentication status in localStorage
         localStorage.setItem("user", JSON.stringify(formData));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
+
         // Again, you might want to store the token or user data
       } else {
         // Handle errors, such as displaying a message to the user
@@ -133,6 +135,7 @@ const App = () => {
         {isAuthenticated && (
           <>
             <Route path="/user-profile" element={<UserProfile />} />
+            <Route path="/edit-profile" element={<EditUserProfile/>} />
             <Route path="/parcel-history" element={<ParcelHistory />} />
             <Route path="/send-parcel" element={<SendParcel />} />
             <Route path="/notifications" element={<Notifications />} />
