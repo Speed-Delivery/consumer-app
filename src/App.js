@@ -24,12 +24,18 @@ const App = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedAuth = JSON.parse(localStorage.getItem("isAuthenticated"));
+    const storedUser = localStorage.getItem("user");
+    const storedAuth = localStorage.getItem("isAuthenticated");
 
-    if (storedUser && storedAuth) {
-      setUser(storedUser);
-      setIsAuthenticated(storedAuth);
+    try {
+      if (storedUser && storedUser !== "undefined") {
+        setUser(JSON.parse(storedUser));
+      }
+      if (storedAuth && storedAuth !== "undefined") {
+        setIsAuthenticated(JSON.parse(storedAuth));
+      }
+    } catch (error) {
+      console.error("Error parsing JSON from localStorage:", error);
     }
   }, []);
 
@@ -51,7 +57,7 @@ const App = () => {
         setIsAuthenticated(true);
 
         // Store user data and authentication status in localStorage
-        localStorage.setItem("user", JSON.stringify(credentials));
+        localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
       } else {
         console.error("Login failed.");
@@ -134,7 +140,15 @@ const App = () => {
         />
         {isAuthenticated && (
           <>
-            <Route path="/user-profile" element={<UserProfile />} />
+            <Route
+              path="/user-profile"
+              element={
+                <UserProfile
+                  user={user}
+                  setIsAuthenticated={setIsAuthenticated}
+                />
+              }
+            />
             <Route path="/edit-profile" element={<EditUserProfile/>} />
             <Route path="/parcel-history" element={<ParcelHistory />} />
             <Route path="/send-parcel" element={<SendParcel />} />

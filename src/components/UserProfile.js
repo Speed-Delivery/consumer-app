@@ -4,17 +4,17 @@ import Login from "./user/Login";
 import Signup from "./user/Signup";
 import { Link } from "react-router-dom";
 
-const UserProfile = () => {
+const UserProfile = ({setIsAuthenticated}) => {
   const [showLogin, setShowLogin] = useState(true);
 
   const [user, setUser] = useState({
-    userId: "1234567890",
-    username: "John Doe",
-    fullname: "John Doe",
-    email: "example@mail.com",
-    phone: "1234567890",
-    role: "Customer",
-    address: "221 B Baker Street, London",
+    userId: "",
+    username: "",
+    fullName: "",
+    email: "",
+    phone: "",
+    role: "",
+    address: "",
   });
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const UserProfile = () => {
           if (res.ok) {
             const data = res.json();
             console.log(data);
-            setUser(data.user);
+            setUser(data);
           }
         })
         .catch((err) => {
@@ -63,7 +63,15 @@ const UserProfile = () => {
           <tbody>
             <tr>
               <td className="border px-4 py-2">Full Name</td>
-              <td className="border px-4 py-2">{user.fullname}</td>
+              <td className="border px-4 py-2">{user.fullName}</td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">User Name</td>
+              <td className="border px-4 py-2">{user.username}</td>
+            </tr>
+            <tr>
+              <td className="border px-4 py-2">User ID</td>
+              <td className="border px-4 py-2">{user._id}</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Email</td>
