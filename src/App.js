@@ -134,7 +134,7 @@ const App = () => {
         />
         {isAuthenticated && (
           <>
-            <Route path="/user-profile" element={<UserProfile />} />
+            <Route path="/user-profile" element={<UserProfile user={user} setIsAuthenticated={setIsAuthenticated} />} />
             <Route path="/edit-profile" element={<EditUserProfile/>} />
             <Route path="/parcel-history" element={<ParcelHistory />} />
             <Route path="/send-parcel" element={<SendParcel />} />

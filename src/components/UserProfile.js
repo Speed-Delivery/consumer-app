@@ -4,7 +4,7 @@ import Login from "./user/Login";
 import Signup from "./user/Signup";
 import { Link } from "react-router-dom";
 
-const UserProfile = () => {
+const UserProfile = ({setIsAuthenticated}) => {
   const [showLogin, setShowLogin] = useState(true);
 
   const [user, setUser] = useState({
@@ -20,7 +20,7 @@ const UserProfile = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const storedAuth = JSON.parse(localStorage.getItem("isAuthenticated"));
-
+    
     if (storedUser && storedAuth) {
       setUser(storedUser);
       setIsAuthenticated(storedAuth);
