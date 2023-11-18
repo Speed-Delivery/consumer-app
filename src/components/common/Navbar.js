@@ -67,6 +67,15 @@ const Navbar = ({ isAuthenticated, onSignOut, user }) => {
               >
                 Profile
               </Link>
+              {/* Admin links only admins*/}
+              {user.role === "admin" && (
+                <Link
+                  to="/admin-panel"
+                  className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+                >
+                  Admin Panel
+                </Link>
+              )}
               <button
                 onClick={handleSignOut}
                 className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
