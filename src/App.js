@@ -35,7 +35,7 @@ const App = () => {
 
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://localhost:5005/api/user/signin", {
+      const response = await fetch("http://localhost:8005/api/user/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,8 +64,8 @@ const App = () => {
   // Define the onSignup function
   const onSignup = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5005/api/user/signup', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8005/api/user/signup", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -135,7 +135,7 @@ const App = () => {
         {isAuthenticated && (
           <>
             <Route path="/user-profile" element={<UserProfile />} />
-            <Route path="/edit-profile" element={<EditUserProfile/>} />
+            <Route path="/edit-profile" element={<EditUserProfile />} />
             <Route path="/parcel-history" element={<ParcelHistory />} />
             <Route path="/send-parcel" element={<SendParcel />} />
             <Route path="/notifications" element={<Notifications />} />
