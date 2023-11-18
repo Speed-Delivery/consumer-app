@@ -4,7 +4,7 @@ import Login from "./user/Login";
 import Signup from "./user/Signup";
 import { Link } from "react-router-dom";
 
-const UserProfile = () => {
+const UserProfile = ({ setIsAuthenticated }) => {
   const [showLogin, setShowLogin] = useState(true);
 
   const [user, setUser] = useState({
@@ -83,7 +83,7 @@ const UserProfile = () => {
             </tr>
           </tbody>
         </table>
-        <Link to={'/edit-profile'}>
+        <Link to={"/edit-profile"}>
           <button className="btn py-2 my-2 bg-black text-white w-full">
             Update Information
           </button>
