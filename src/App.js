@@ -44,37 +44,32 @@ const App = () => {
   // Define the handleLogin function
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://localhost:5005/api/users/signin", {
+      const response = await fetch("http://localhost:5005/api/user/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(credentials),
       });
-  
+
       if (response.ok) {
         const data = await response.json();
-        console.log("Login response data:", data); // Log the response data
-        console.log("")
-        setUser(data); // Assuming data contains the user details
+        console.log("Login successful!", data);
+        // console.log(credentials);
+        setUser(credentials);
         setIsAuthenticated(true);
-  
-        // Store user data, authentication status, and token in localStorage
-        localStorage.setItem("user", JSON.stringify(data));
+
+        // Store user data and authentication status in localStorage
+        localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
-        localStorage.setItem("token", data.token); // Store the token
-  
-        // Log for debugging: Confirm that the token is stored
-        const storedToken = localStorage.getItem("token");
-        console.log("Stored token:", storedToken);
       } else {
         console.error("Login failed.");
+        console.error(response.error);
       }
     } catch (err) {
       console.error("There was an error.", err);
     }
   };
-  
 
   // Define the onSignup function
   const onSignup = async (formData) => {

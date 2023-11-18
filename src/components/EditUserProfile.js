@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const EditUserProfile = () => {
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  console.log(storedUser);
+
   const [user, setUser] = useState({
-    userId: "1234567890",
-    username: "John Doe",
-    fullname: "John Doe",
-    email: "@mail.com",
-    phone: "1234567890",
-    role: "Customer",
-    address: "221 B Baker Street, London",
+    userId: storedUser._id,
+    username: storedUser.username,
+    fullName: storedUser.fullName,
+    email: storedUser.email,
+    phone: storedUser.phone,
+    role: storedUser.role,
+    address: storedUser.address,
   });
 
   const handleChange = (e) => {
@@ -16,9 +20,10 @@ const EditUserProfile = () => {
     setUser({ ...user, [name]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     // send updated user data to the server
-    fetch("http://localhost:5005/api/user/update", {
+    fetch("http://localhost:5005/api/user/profile", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -27,14 +32,22 @@ const EditUserProfile = () => {
     })
       .then((res) => {
         if (res.ok) {
-          const data = res.json();
-          console.log(data);
+          return res.json(); // return the promise from res.json()
+        }
+      })
+      .then((data) => {
+        if (data) {
+          console.log("user at user :", data);
+          setUser(data); // set user data from response
+          localStorage.setItem("user", JSON.stringify(data)); // store user data from response
         }
       })
       .catch((err) => {
         console.error("There was an error.", err);
       });
   };
+
+  useEffect(() => {}, [user]);
 
   return (
     <div className="bg-gray-100 flex justify-center items-center min-h-screen">
@@ -49,20 +62,32 @@ const EditUserProfile = () => {
                 <td className="border px-4 py-2">Full Name</td>
                 <input
                   type="text"
-                  name="fullname"
-                  id="fullname"
-                  value={user.fullname}
+                  name="fullName"
+                  id="fullName"
+                  value={user.fullName}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray rounded"
                 />
               </tr>
               <tr>
+                <td className="border px-4 py-2">User Name</td>
+                <input
+                  type="text"
+                  name="fullName"
+                  id="fullName"
+                  value={user.username}
+                  onChange={handleChange}
+                  className="w-full p-3 border border-gray rounded"
+                />
+              </tr>
+
+              <tr>
                 <td className="border px-4 py-2">Email</td>
                 <input
                   type="text"
-                  name="fullname"
-                  id="fullname"
-                  value={user.fullname}
+                  name="email"
+                  id="email"
+                  value={user.email}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray rounded"
                 />
@@ -103,7 +128,10 @@ const EditUserProfile = () => {
               </tr>
             </tbody>
           </table>
-          <button className="btn py-2 my-2 bg-black text-white w-full">
+          <button
+            type="submit"
+            className="btn py-2 my-2 bg-black text-white w-full"
+          >
             Update
           </button>
         </form>
