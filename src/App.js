@@ -1,10 +1,9 @@
-// App.js
+// src/App.js
 import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  Outlet,
   Navigate,
 } from "react-router-dom";
 import Home from "./pages/Home";
@@ -20,8 +19,12 @@ import Signup from "./components/user/Signup";
 import EditUserProfile from "./components/EditUserProfile";
 
 const App = () => {
+  const isAdmin = true;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+
+  //const isAdmin = user?.role === "admin"; // Checks if logged-in user is an admin
+  console.log("Is Admin:", isAdmin); // Debugging
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -30,29 +33,40 @@ const App = () => {
     if (storedUser && storedAuth) {
       setUser(storedUser);
       setIsAuthenticated(storedAuth);
+      console.log("User from storage:", storedUser); // Debugging
     }
   }, []);
 
+  useEffect(() => {
+    console.log("isAdmin updated:", isAdmin);
+  }, [isAdmin]);
+  
+  // Define the handleLogin function
   const handleLogin = async (credentials) => {
     try {
-      const response = await fetch("http://localhost:5005/api/user/signin", {
+      const response = await fetch("http://localhost:5005/api/users/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(credentials),
       });
-
+  
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        // console.log(credentials);
-        setUser(credentials);
+        console.log("Login response data:", data); // Log the response data
+        console.log("")
+        setUser(data); // Assuming data contains the user details
         setIsAuthenticated(true);
-
-        // Store user data and authentication status in localStorage
-        localStorage.setItem("user", JSON.stringify(credentials));
+  
+        // Store user data, authentication status, and token in localStorage
+        localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
+        localStorage.setItem("token", data.token); // Store the token
+  
+        // Log for debugging: Confirm that the token is stored
+        const storedToken = localStorage.getItem("token");
+        console.log("Stored token:", storedToken);
       } else {
         console.error("Login failed.");
       }
@@ -60,11 +74,12 @@ const App = () => {
       console.error("There was an error.", err);
     }
   };
+  
 
   // Define the onSignup function
   const onSignup = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5005/api/user/signup', {
+      const response = await fetch('http://localhost:5005/api/users', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +117,6 @@ const App = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("isAuthenticated");
   };
-
   return (
     <Router>
       <Navbar
@@ -112,39 +126,19 @@ const App = () => {
       />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/signin"
-          element={
-            !isAuthenticated ? (
-              <Login onAuthenticated={handleLogin} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            !isAuthenticated ? (
-              <Signup onSignup={onSignup} />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        {isAuthenticated && (
-          <>
-            <Route path="/user-profile" element={<UserProfile user={user} setIsAuthenticated={setIsAuthenticated} />} />
-            <Route path="/edit-profile" element={<EditUserProfile/>} />
-            <Route path="/parcel-history" element={<ParcelHistory />} />
-            <Route path="/send-parcel" element={<SendParcel />} />
-            <Route path="/notifications" element={<Notifications />} />
-            {/* ... additional authenticated routes */}
-          </>
-        )}
+        <Route path="/signin" element={!isAuthenticated ? <Login onAuthenticated={handleLogin} /> : <Navigate to="/" />} />
+        <Route path="/signup" element={!isAuthenticated ? <Signup onSignup={onSignup} /> : <Navigate to="/" />} />
+        {isAuthenticated && <Route path="/user-profile" element={<UserProfile user={user} setIsAuthenticated={setIsAuthenticated} />} />}
+        {isAuthenticated && <Route path="/edit-profile" element={<EditUserProfile />} />}
+        {isAuthenticated && <Route path="/parcel-history" element={<ParcelHistory />} />}
+        {isAuthenticated && <Route path="/send-parcel" element={<SendParcel />} />}
+        {isAuthenticated && <Route path="/notifications" element={<Notifications />} />}
+        {isAdmin && <Route path="/admin-panel" element={<AdminPanel />} />}
       </Routes>
+      <Footer />
     </Router>
   );
+  
 };
 
 export default App;
