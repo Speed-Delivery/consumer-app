@@ -1,170 +1,130 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from 'react';
+import { UserContext } from './context/UserContext';
 
 const EditUserProfile = () => {
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = storedUser._id;
-  console.log(storedUser);
-
-  const [user, setUser] = useState({
-    userId: userId,
-    username: storedUser.username,
-    fullName: storedUser.fullName,
-    email: storedUser.email,
-    phone: storedUser.phone,
-    address: storedUser.address,
-    role: storedUser.role,
+  const { user, updateUser } = useContext(UserContext); 
+  console.log("The object user value is: ",user);
+  // Initialize editUser state directly with user from context
+  const [editUser, setEditUser] = useState({
+    userId: user._id,
+    username: user.username,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    address: user.address,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser((prevUser) => ({
+    setEditUser(prevUser => ({
       ...prevUser,
       [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Ensure that user.userId is correctly set before making the PUT request
-    if (!user.userId) {
-      console.error("User ID is undefined.");
-      return;
-    }
-  
-    console.log("User data is before fetch: ", user);
-    console.log("Userid is before fetch is : ", user.userId);
-  
-    // send updated user data to the server
     const token = localStorage.getItem('token');
-  
-    fetch(`http://localhost:5005/api/users/${user.userId}`, { // use user.userId here
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token,
-      },
-      body: JSON.stringify(user),
-    })
-    .then((res) => {
-      if (!res.ok) {
-        throw new Error("Failed to update user.");
+
+    try {
+      const response = await fetch(`http://localhost:5005/api/users/${editUser.userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(editUser),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user.');
       }
-      return res.json();
-    })
-    .then((data) => {
-      if (data) {
-        console.log("User data after fetch: ", data);
-        // If the response doesn't include a userId, retain the original userId
-        const updatedUser = data.userId ? data : { ...data, userId: user.userId };
-        setUser(data);
-        localStorage.setItem("user", JSON.stringify(data));
-        alert("User profile updated successfully!");
-      }
-    })
-    .catch((err) => {
-      console.error("Error updating user:", err);
-    });
+
+      const updatedUserData = await response.json();
+      updateUser(updatedUserData); // Update the user data in the context
+      alert('User profile updated successfully!');
+    } catch (err) {
+      console.error('Error updating user:', err);
+    }
   };
-  
-  useEffect(() => {}, [user]);
+
+
   return (
     <div className="bg-gray-100 flex justify-center items-center min-h-screen">
       <div className="bg-white shadow-2xl rounded-2xl p-4 w-8/12 max-w-md">
-        <h1 className="text-center font-semibold text-2xl py-2">
-          User Profile
-        </h1>
+        <h1 className="text-center font-semibold text-2xl py-2">Edit User Profile</h1>
         <form onSubmit={handleSubmit}>
-          <table className="table-auto w-full">
-            <tbody>
-              <tr>
-                <td className="border px-4 py-2">Full Name</td>
-                <td>
-                  <input
-                    type="text"
-                    name="fullName"
-                    id="fullName"
-                    value={user.fullName}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Username</td>
-                <td>
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    value={user.username}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Email</td>
-                <td>
-                  <input
-                    type="text"
-                    name="email"
-                    id="email"
-                    value={user.email}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Phone Number</td>
-                <td>
-                  <input
-                    type="text"
-                    name="phone"
-                    id="phone"
-                    value={user.phone}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Address</td>
-                <td>
-                  <input
-                    type="text"
-                    name="address"
-                    id="address"
-                    value={user.address}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td className="border px-4 py-2">Role</td>
-                <td>
-                  <input
-                    type="text"
-                    name="role"
-                    id="role"
-                    value={user.role}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray rounded"
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div className="text-center">
-            <button
-              type="submit"
-              className="btn py-2 my-2 bg-black text-white w-full"
-            >
-              Update
-            </button>
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-gray-700 text-sm font-bold mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              value={editUser.username}
+              onChange={handleChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
           </div>
+          <div className="mb-4">
+            <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="fullName"
+              id="fullName"
+              value={editUser.fullName}
+              onChange={handleChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value={editUser.email}
+              onChange={handleChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
+              Phone Number
+            </label>
+            <input
+              type="text"
+              name="phone"
+              id="phone"
+              value={editUser.phone}
+              onChange={handleChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="address" className="block text-gray-700 text-sm font-bold mb-2">
+              Address
+            </label>
+            <input
+              type="text"
+              name="address"
+              id="address"
+              value={editUser.address}
+              onChange={handleChange}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            />
+          </div>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Update Profile
+          </button>
         </form>
       </div>
     </div>
