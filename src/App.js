@@ -1,11 +1,5 @@
-// src/App.js
-import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import React, { useContext } from "react";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/common/Navbar";
 import Notifications from "./components/notifications/Notification";
@@ -17,39 +11,13 @@ import Login from "./components/user/Login";
 import AdminPanel from "./components/user/AdminPanel";
 import Signup from "./components/user/Signup";
 import EditUserProfile from "./components/EditUserProfile";
+import {  UserContext } from "./components/context/UserContext";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, updateUser, isAuthenticated, setIsAuthenticated } = useContext(UserContext);
 
-  // Determines if the logged-in user is an admin
-  const isAdmin = user?.role === "admin";
-  console.log("Is Admin:", isAdmin);
-
-  useEffect(() => {
-    console.log("The user value is: ", user);
-    console.log("isAdmin is: ", isAdmin);
-  }, [user]);
-  
-  useEffect(() => {
-    try {
-      const storedUserJson = localStorage.getItem("user");
-      const storedAuthJson = localStorage.getItem("isAuthenticated");
-  
-      if (storedUserJson && storedUserJson !== "undefined") {
-        const storedUser = JSON.parse(storedUserJson);
-        setUser(storedUser);
-      }
-  
-      if (storedAuthJson && storedAuthJson !== "undefined") {
-        const storedAuth = JSON.parse(storedAuthJson);
-        setIsAuthenticated(storedAuth === "true");
-      }
-    } catch (error) {
-      console.error("Error parsing localStorage data:", error);
-    }
-  }, []);
-  
+  console.log("Current User: ", user);
+  console.log("Is Authenticated: ", isAuthenticated);
   const handleLogin = async (credentials) => {
     try {
       const response = await fetch("http://localhost:5005/api/users/signin", {
@@ -62,21 +30,18 @@ const App = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Login successful!", data);
-        setUser(data);
+        updateUser(data);
         setIsAuthenticated(true);
         localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
       } else {
         console.error("Login failed.");
-        console.error(response.error);
       }
     } catch (err) {
       console.error("There was an error.", err);
     }
   };
 
-  // Define the onSignup function
   const onSignup = async (formData) => {
     try {
       const response = await fetch('http://localhost:5005/api/users', {
@@ -89,20 +54,15 @@ const App = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Handle successful signup, perhaps automatically logging in the user
-        console.log("Signup successful!", data);
-        console.log(formData);
         setIsAuthenticated(true);
 
-        setUser(formData);
+        // Update user state using updateUser from Context
+        updateUser(data);  // Assuming the response returns the user object
 
-        // Store user data and authentication status in localStorage
-        localStorage.setItem("user", JSON.stringify(formData));
+        // Update local storage
+        localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
-
-        // Again, you might want to store the token or user data
       } else {
-        // Handle errors, such as displaying a message to the user
         console.error("Signup failed");
       }
     } catch (error) {
@@ -112,33 +72,32 @@ const App = () => {
 
   const handleSignOut = () => {
     setIsAuthenticated(false);
-    // Perform any clean-up or state reset actions
-    // Clean up authentication state, remove token, etc.
     localStorage.removeItem("user");
     localStorage.removeItem("isAuthenticated");
   };
+
+
   return (
-    <Router>
-      <Navbar
-        user={user}
-        isAuthenticated={isAuthenticated}
-        onSignOut={handleSignOut}
-      />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/signin" element={!isAuthenticated ? <Login onAuthenticated={handleLogin} /> : <Navigate to="/" />} />
-        <Route path="/signup" element={!isAuthenticated ? <Signup onSignup={onSignup} /> : <Navigate to="/" />} />
-        {isAuthenticated && <Route path="/user-profile" element={<UserProfile user={user} setIsAuthenticated={setIsAuthenticated} />} />}
-        {isAuthenticated && <Route path="/edit-profile" element={<EditUserProfile />} />}
-        {isAuthenticated && <Route path="/parcel-history" element={<ParcelHistory />} />}
-        {isAuthenticated && <Route path="/send-parcel" element={<SendParcel />} />}
-        {isAuthenticated && <Route path="/notifications" element={<Notifications />} />}
-        {isAdmin && <Route path="/admin-panel" element={<AdminPanel />} />}
-      </Routes>
-      <Footer />
-    </Router>
+      <Router>
+        <Navbar
+          user={user}
+          isAuthenticated={isAuthenticated}
+          onSignOut={handleSignOut}
+        />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signin" element={!isAuthenticated ? <Login onAuthenticated={handleLogin} /> : <Navigate to="/" />} />
+          <Route path="/signup" element={!isAuthenticated ? <Signup onSignup={onSignup} /> : <Navigate to="/" />} />
+          {isAuthenticated && <Route path="/user-profile" element={<UserProfile />} />}
+          {isAuthenticated && <Route path="/edit-profile" element={<EditUserProfile />} />}
+          {isAuthenticated && <Route path="/parcel-history" element={<ParcelHistory />} />}
+          {isAuthenticated && <Route path="/send-parcel" element={<SendParcel />} />}
+          {isAuthenticated && <Route path="/notifications" element={<Notifications />} />}
+          {user?.role === "admin" && <Route path="/admin-panel" element={<AdminPanel />} />}
+        </Routes>
+        <Footer />
+      </Router>
   );
-  
 };
 
 export default App;
