@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 
@@ -6,8 +6,16 @@ const Navbar = ({ isAuthenticated, onSignOut, user }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  console.log(user, "this is user");
+  // Check if the user is an admin
+  const isAdmin = user && user.role === "admin";
+  console.log("The user value is: ", user);
+  console.log("isAdmin is: ", isAdmin)
 
+  useEffect(() => {
+    console.log("The user value is: ", user);
+    console.log("isAdmin is: ", isAdmin);
+  }, [user]);
+  
   const handleSignOut = () => {
     onSignOut();
     navigate('/signin');
@@ -68,7 +76,7 @@ const Navbar = ({ isAuthenticated, onSignOut, user }) => {
                 Profile
               </Link>
               {/* Admin links only admins*/}
-              {user.role === "admin" && (
+              {isAdmin && (
                 <Link
                   to="/admin-panel"
                   className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
