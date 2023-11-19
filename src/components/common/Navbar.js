@@ -1,9 +1,11 @@
-import React, { useState , useEffect} from "react";
+import React, { useState , useContext} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
+import { UserContext } from "../context/UserContext";
 
-const Navbar = ({ isAuthenticated, onSignOut, user }) => {
+const Navbar = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, setIsAuthenticated } = useContext(UserContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Check if the user is an admin
@@ -11,13 +13,11 @@ const Navbar = ({ isAuthenticated, onSignOut, user }) => {
   console.log("The user value is: ", user);
   console.log("isAdmin is: ", isAdmin)
 
-  useEffect(() => {
-    console.log("The user value is: ", user);
-    console.log("isAdmin is: ", isAdmin);
-  }, [user]);
   
   const handleSignOut = () => {
-    onSignOut();
+    setIsAuthenticated(false);
+    localStorage.removeItem("user");
+    localStorage.removeItem("isAuthenticated");
     navigate('/signin');
   };
 
