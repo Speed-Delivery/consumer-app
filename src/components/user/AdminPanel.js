@@ -55,8 +55,21 @@ const AdminPanel = () => {
     const handleDelete = async (userId) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
             try {
-                // needs token
-                const token = localStorage.getItem('token'); // or however you're storing the token
+                const userString = localStorage.getItem('user'); // Change the key to 'user'
+                console.log('User String:', userString); // Debugging
+                
+                if (!userString) {
+                    console.error('No user data found');
+                    return;
+                }
+    
+                const user = JSON.parse(userString);
+                const token = user.token;
+                console.log('Token:', token); // Debugging
+                    if (!token) {
+                        console.error('No token found');
+                        return;
+                    }
                 const response = await fetch(`http://localhost:5005/api/users/${userId}`, {
                     method: 'DELETE',
                     headers: {
@@ -89,20 +102,36 @@ const AdminPanel = () => {
         );
     };
 
-    const handleEdit = async (user) => {
+    const handleEdit = async (userData) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5005/api/users/${user._id}`, {
+            const userString = localStorage.getItem('user'); // Change the key to 'user'
+            console.log('User String:', userString); // Debugging
+    
+            if (!userString) {
+                console.error('No user data found');
+                return;
+            }
+    
+            const user = JSON.parse(userString);
+            const token = user.token;
+            console.log('Token:', token); // Debugging
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+    
+            const response = await fetch(`http://localhost:5005/api/users/${userData._id}`, {
                 method: 'PUT',
                 headers: {
                     'content-type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify(user), // Send updated user data
+                body: JSON.stringify(userData), // Send updated user data
             });
+    
             if (response.ok) {
                 fetchUsers(); // Refresh the list after edit
-                toggleEditMode(user._id); // Exit edit mode
+                toggleEditMode(userData._id); // Exit edit mode
             } else {
                 throw new Error('Error editing user');
             }
@@ -110,6 +139,7 @@ const AdminPanel = () => {
             console.error('Error editing user:', error);
         }
     };
+    
 
     const handleCancel = (userId) => {
         toggleEditMode(userId); // Exit edit mode
