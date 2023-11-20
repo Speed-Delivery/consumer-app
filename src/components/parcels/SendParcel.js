@@ -32,7 +32,7 @@ const SendParcel = () => {
             Please fill in the parcel and sender details below
           </span>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div class="flex flex-col md:flex-row">
+            <div className="flex flex-col md:flex-row">
               <div className="py-4 md:w-1/2 md:pr-2">
                 <span className="mb-2 block text-md">Width (cm)</span>
                 <input
@@ -55,7 +55,7 @@ const SendParcel = () => {
                 />
               </div>
             </div>
-            <div class="flex flex-col md:flex-row">
+            <div className="flex flex-col md:flex-row">
               <div className="py-4 md:w-1/2 md:pr-2">
                 <span className="mb-2 block text-md">Depth (cm)</span>
                 <input
@@ -78,7 +78,7 @@ const SendParcel = () => {
                 />
               </div>
             </div>
-            <div class="flex flex-col md:flex-row">
+            <div className="flex flex-col md:flex-row">
               <div className="py-4 md:w-1/2 md:pr-2">
                 <span className="mb-2 block text-md">Sender ID</span>
                 <input
