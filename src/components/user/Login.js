@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link , useNavigate } from 'react-router-dom';
+import { UserContext } from '../context/UserContext';
 
 const Login = ({ onAuthenticated }) => {
   const [credentials, setCredentials] = useState({
@@ -9,20 +10,43 @@ const Login = ({ onAuthenticated }) => {
   });
   const [error, setError] = useState('');
 
+  const { setUser, setIsAuthenticated } = useContext(UserContext);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!credentials.username.trim() || !credentials.password) {
       setError('Please enter both username and password.');
-    } else if (!credentials.role) {
-      setError('Please select a role.');
     } else {
       setError('');
-      onAuthenticated(credentials);
+      // Here we call the login API
+      try {
+        const response = await fetch("http://localhost:5005/api/users/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(credentials),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data);
+          setIsAuthenticated(true);
+          localStorage.setItem("user", JSON.stringify(data));
+          navigate('/'); // Redirect to home page or dashboard
+        } else {
+          setError('Login failed. Please check your username and password.');
+        }
+      } catch (err) {
+        console.error("There was an error during login", err);
+        setError('An error occurred. Please try again.');
+      }
     }
   };
 
