@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
+import { UserContext } from "../context/UserContext"; 
 
-const Signup = ({ onSignup }) => {
+const Signup = () => {
+  const { updateUser, setIsAuthenticated } = useContext(UserContext);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -13,17 +15,57 @@ const Signup = ({ onSignup }) => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prevFormData => ({
+    const { name, value, type } = e.target;
+  
+    // If the input is a radio button, set the value directly
+    const newValue = type === "radio" ? value : e.target.value;
+  
+    setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value
+      [name]: newValue,
     }));
+  };
+  
+
+  const handleSignup = async () => {
+    try {
+      const response = await fetch('http://localhost:5005/api/users', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Log role and isAdmin for debugging
+        console.log("Role:", data.user.role);
+        console.log("isAdmin:", data.isAdmin);
+
+        // Set isAdmin based on the role
+        const isAdmin = data.user.role === 'admin';
+
+        // Update user state using updateUser from Context
+        updateUser({ ...data.user, isAdmin });
+        setIsAuthenticated(true);
+        // Update local storage
+        localStorage.setItem("user", JSON.stringify({ ...data.user, isAdmin }));
+        localStorage.setItem("isAuthenticated", JSON.stringify(true));
+      } else {
+        console.error("Signup failed");
+      }
+    } catch (error) {
+      console.error("There was an error during signup", error);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSignup(formData);
+    handleSignup();
   };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
