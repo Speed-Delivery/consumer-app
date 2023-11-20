@@ -9,7 +9,7 @@ const AdminPanel = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
     const [editMode, setEditMode] = useState({});
-    const { user, updateUser } = useContext(UserContext); // Use UserContext
+    const { user } = useContext(UserContext); // Use UserContext
 
     useEffect(() => {
         fetchUsers();
@@ -18,23 +18,38 @@ const AdminPanel = () => {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem('token'); // or however you're storing the token
-            console.log('Token:', token); // Debugging
-            const response = await fetch('http://localhost:5005/api/users/allusers', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-            });
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+
+            const userString = localStorage.getItem('user'); // Change the key to 'user'
+            console.log('User String:', userString); // Debugging
+            
+            if (!userString) {
+                console.error('No user data found');
+                return;
             }
-            const data = await response.json();
-            setUsers(data);
-            console.log('Data:', data); // Debugging
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        }
+
+            const user = JSON.parse(userString);
+            const token = user.token;
+            console.log('Token:', token); // Debugging
+                if (!token) {
+                    console.error('No token found');
+                    return;
+                }
+
+                const response = await fetch('http://localhost:5005/api/users/allusers', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                });
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setUsers(data);
+                console.log('Fetched Users:', data); // Debugging
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
     };
 
     const handleDelete = async (userId) => {
@@ -106,9 +121,7 @@ const AdminPanel = () => {
 
     const paginate = pageNumber => setCurrentPage(pageNumber);
     console.log('Users:', users); // Debugging
-    // user 
     console.log('User:', user); // Debugging
-    // currentUsers
     console.log('Current Users:', currentUsers); // Debugging
     return (
         <div className="container mx-auto mt-10">
