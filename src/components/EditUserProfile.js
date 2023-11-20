@@ -24,28 +24,37 @@ const EditUserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
 
     try {
-      const response = await fetch(`http://localhost:5005/api/users/${editUser.userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(editUser),
-      });
+      const userString = localStorage.getItem('user'); // Change the key to 'user'
+        console.log('User String:', userString); // Debugging
+        if (!userString) {
+            console.error('No user data found');
+            return;
+        }
 
-      if (!response.ok) {
-        throw new Error('Failed to update user.');
+        const user = JSON.parse(userString);
+        const token = user.token;
+        console.log('Token:', token); // Debugging
+        const response = await fetch(`http://localhost:5005/api/users/${editUser.userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(editUser),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update user.');
+        }
+
+        const updatedUserData = await response.json();
+        updateUser(updatedUserData); // Update the user data in the context
+        alert('User profile updated successfully!');
+      } catch (err) {
+        console.error('Error updating user:', err);
       }
-
-      const updatedUserData = await response.json();
-      updateUser(updatedUserData); // Update the user data in the context
-      alert('User profile updated successfully!');
-    } catch (err) {
-      console.error('Error updating user:', err);
-    }
   };
 
 
