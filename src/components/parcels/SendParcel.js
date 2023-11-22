@@ -1,24 +1,60 @@
 import React, { useState } from "react";
 
-const SendParcel = () => {
-  const [parcelInfo, setParcelInfo] = useState({
+const ParcelForm = () => {
+  const [formData, setFormData] = useState({
+    description: "",
+    weight: "",
+    length: "",
     width: "",
     height: "",
-    depth: "",
-    mass: "",
-    recipientId: "",
-    senderId: "",
+    senderUsername: "",
+    receiverUsername: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setParcelInfo({ ...parcelInfo, [name]: value });
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
+
+  const sendParcel = async () => {
+    const parcelData = {
+      parcelDescription: formData.description,
+      parcelWeight: parseFloat(formData.weight),
+      parcelDimension: {
+        length: parseFloat(formData.length),
+        width: parseFloat(formData.width),
+        height: parseFloat(formData.height),
+      },
+      status: "awaiting pickup",
+      senderUsername: formData.senderUsername,
+      receiverUsername: formData.receiverUsername,
+    };
+
+    console.log(parcelData);
+
+    try {
+      const response = await fetch("http://localhost:5005/api/parcels", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parcelData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Parcel sent successfully:", result);
+    } catch (error) {
+      console.error("There was a problem sending the parcel:", error);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // You can send the parcel information to your backend or perform any other action here
-    console.log(parcelInfo);
+    sendParcel();
   };
 
   return (
@@ -32,71 +68,83 @@ const SendParcel = () => {
             Please fill in the parcel and sender details below
           </span>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Description Input */}
+            <div className="mb-4">
+              <span className="mb-2 block text-md">Description</span>
+              <input
+                className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                type="text"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+              />
+            </div>
+            {/* Dimension Inputs */}
             <div className="flex flex-col md:flex-row">
-              <div className="py-4 md:w-1/2 md:pr-2">
+              <div className="mb-4 md:mb-0 md:w-1/2 lg:w-1/3 md:pr-2">
                 <span className="mb-2 block text-md">Width (cm)</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   required
                   type="number"
                   name="width"
+                  value={formData.width}
                   onChange={handleChange}
                 />
               </div>
-              <div className="py-4 md:w-1/2 md:pr-2">
+              <div className="mb-4 md:mb-0 md:w-1/2 lg:w-1/3 md:pr-2">
                 <span className="mb-2 block text-md">Height (cm)</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   required
                   type="number"
-                  id="height"
                   name="height"
+                  value={formData.height}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="md:w-1/2 lg:w-1/3 lg:pr-2">
+                <span className="mb-2 block text-md">length (cm)</span>
+                <input
+                  className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
+                  type="number"
+                  name="length"
+                  value={formData.length}
                   onChange={handleChange}
                 />
               </div>
             </div>
+            {/* Weight and IDs Inputs */}
             <div className="flex flex-col md:flex-row">
-              <div className="py-4 md:w-1/2 md:pr-2">
-                <span className="mb-2 block text-md">Depth (cm)</span>
-                <input
-                  className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
-                  type="number"
-                  id="depth"
-                  name="depth"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="py-4 md:w-1/2 md:pr-2">
-                <span className="mb-2 block text-md">Mass (kg)</span>
+              <div className="mb-4 md:mb-0 md:w-1/2 lg:w-1/3 md:pr-2">
+                <span className="mb-2 block text-md">weight (kg)</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   required
                   type="number"
-                  id="mass"
-                  name="mass"
+                  name="weight"
+                  value={formData.mass}
                   onChange={handleChange}
                 />
               </div>
-            </div>
-            <div className="flex flex-col md:flex-row">
-              <div className="py-4 md:w-1/2 md:pr-2">
-                <span className="mb-2 block text-md">Sender ID</span>
+              <div className="mb-4 md:mb-0 md:w-1/2 lg:w-1/3 md:pr-2">
+                <span className="mb-2 block text-md">Sender username</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   type="text"
-                  id="depth"
-                  name="depth"
+                  name="senderUsername"
+                  value={formData.senderUsername}
                   onChange={handleChange}
                 />
               </div>
-              <div className="py-4 md:w-1/2 md:pr-2">
-                <span className="mb-2 block text-md">Recipient ID</span>
+              <div className="md:w-1/2 lg:w-1/3">
+                <span className="mb-2 block text-md">Recipient username</span>
                 <input
                   className="w-full p-2 border border-gray-300 rounded-md placeholder:font-light placeholder:text-gray-500"
                   required
                   type="text"
-                  id="mass"
-                  name="mass"
+                  name="receiverUsername"
+                  value={formData.receiverUsername}
                   onChange={handleChange}
                 />
               </div>
@@ -113,4 +161,5 @@ const SendParcel = () => {
     </div>
   );
 };
-export default SendParcel;
+
+export default ParcelForm;
