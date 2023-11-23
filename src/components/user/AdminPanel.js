@@ -35,7 +35,7 @@ const AdminPanel = () => {
                     return;
                 }
 
-                const response = await fetch('http://localhost:5005/api/users/allusers', {
+                const response = await fetch('http://localhost:5000/api/users/allusers', {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -70,7 +70,7 @@ const AdminPanel = () => {
                         console.error('No token found');
                         return;
                     }
-                const response = await fetch(`http://localhost:5005/api/users/${userId}`, {
+                const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
                     method: 'DELETE',
                     headers: {
                         'content-type': 'application/json',
@@ -120,7 +120,7 @@ const AdminPanel = () => {
                 return;
             }
     
-            const response = await fetch(`http://localhost:5005/api/users/${userData._id}`, {
+            const response = await fetch(`http://localhost:5000/api/users/${userData._id}`, {
                 method: 'PUT',
                 headers: {
                     'content-type': 'application/json',

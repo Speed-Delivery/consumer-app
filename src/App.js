@@ -5,13 +5,14 @@ import Navbar from "./components/common/Navbar";
 import Notifications from "./components/notifications/Notification";
 import ParcelHistory from "./components/history/ParcelHistory";
 import SendParcel from "./components/parcels/SendParcel";
-import UserProfile from "./components/UserProfile";
+import UserProfile from "./components/user/UserProfile";
 import Footer from "./components/common/Footer";
 import Login from "./components/user/Login";
 import AdminPanel from "./components/user/AdminPanel";
 import Signup from "./components/user/Signup";
-import EditUserProfile from "./components/EditUserProfile";
+import EditUserProfile from "./components/user/EditUserProfile";
 import {  UserContext } from "./components/context/UserContext";
+import AccountDeletion from "./components/user/ AccountDeletion";
 
 const App = () => {
   const { user, isAuthenticated, setIsAuthenticated } = useContext(UserContext);
@@ -43,7 +44,7 @@ const App = () => {
         {isAuthenticated && <Route path="/parcel-history" element={<ParcelHistory />} />}
         {isAuthenticated && <Route path="/send-parcel" element={<SendParcel />} />}
         {isAuthenticated && <Route path="/notifications" element={<Notifications />} />}
-        {user?.role === "admin" && <Route path="/admin-panel" element={<AdminPanel />} />}
+        {isAuthenticated && <Route path="/account-deletion" element={<AccountDeletion />} />}
       </Routes>
       <Footer />
     </Router>
