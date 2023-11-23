@@ -26,7 +26,7 @@ const Login = ({ onAuthenticated }) => {
       setError('');
       // Here we call the login API
       try {
-        const response = await fetch("http://localhost:5005/api/users/signin", {
+        const response = await fetch("http://localhost:5000/api/users/signin", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -84,42 +84,6 @@ const Login = ({ onAuthenticated }) => {
               placeholder="Enter your password"
               required
             />
-          </div>
-          <div className="mb-6">
-            <span className="block text-gray-700 text-sm font-bold mb-2">Role</span>
-            <label className="inline-flex items-center">
-              <input 
-                type="radio" 
-                name="role" 
-                value="user"
-                checked={credentials.role === 'user'}
-                onChange={handleChange} 
-                className="form-radio h-5 w-5 text-red-600"
-              />
-              <span className="ml-2 text-gray-700">User</span>
-            </label>
-            <label className="inline-flex items-center ml-6">
-              <input 
-                type="radio" 
-                name="role" 
-                value="driver"
-                checked={credentials.role === 'driver'}
-                onChange={handleChange} 
-                className="form-radio h-5 w-5 text-red-600"
-              />
-              <span className="ml-2 text-gray-700">Driver</span>
-            </label>
-            <label className="inline-flex items-center ml-6">
-              <input 
-                type="radio" 
-                name="role" 
-                value="admin"
-                checked={credentials.role === 'admin'}
-                onChange={handleChange} 
-                className="form-radio h-5 w-5 text-red-600"
-              />
-              <span className="ml-2 text-gray-700">Admin</span>
-            </label>
           </div>
           {error && <p className="text-red-500 text-xs italic">{error}</p>}
           <button type="submit" className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-700">

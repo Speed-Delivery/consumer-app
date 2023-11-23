@@ -2,7 +2,6 @@ import React, { useState , useContext} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMenu } from "react-icons/io5";
 import { UserContext } from "../context/UserContext";
-
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, setIsAuthenticated } = useContext(UserContext);
@@ -74,6 +73,12 @@ const Navbar = () => {
                 className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
               >
                 Profile
+              </Link>
+              <Link
+                to="/account-deletion"
+                className="lg:inline-flex lg:w-auto w-full px-3 py-2 rounded text-gray-400 items-center justify-center hover:bg-gray-900 hover:text-white"
+              >
+               Account Deletion
               </Link>
               {/* Admin links only admins*/}
               {isAdmin && (

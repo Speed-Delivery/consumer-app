@@ -4,21 +4,18 @@ import { UserContext } from "../context/UserContext";
 
 const Signup = () => {
   const { updateUser, setIsAuthenticated } = useContext(UserContext);
+  const [, setError] = useState(null); // State to hold error information
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    role: 'user',
-    fullName: '',
-    phone: '',
-    address: ''
   });
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-  
-    // If the input is a radio button, set the value directly
-    const newValue = type === "radio" ? value : e.target.value;
+
+    const { name, value } = e.target;
+    const newValue = name === 'username' ? value.toLowerCase() : value;
   
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -26,10 +23,10 @@ const Signup = () => {
     }));
   };
   
-
+  console.log("Before sending ",formData);
   const handleSignup = async () => {
     try {
-      const response = await fetch('http://localhost:5005/api/users', {
+      const response = await fetch('http://localhost:5000/api/users', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -41,29 +38,32 @@ const Signup = () => {
         const data = await response.json();
 
         // Log role and isAdmin for debugging
-        console.log("Role:", data.user.role);
-        console.log("isAdmin:", data.isAdmin);
-
-        // Set isAdmin based on the role
-        const isAdmin = data.user.role === 'admin';
-
+        console.log("User", data.user);
         // Update user state using updateUser from Context
-        updateUser({ ...data.user, isAdmin });
+        updateUser({ ...data.user });
         setIsAuthenticated(true);
         // Update local storage
-        localStorage.setItem("user", JSON.stringify({ ...data.user, isAdmin }));
+        localStorage.setItem("user", JSON.stringify({ ...data.user}));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
       } else {
-        console.error("Signup failed");
+        const errorData = await response.json(); // Get error details from the response
+        throw new Error(errorData.message || 'Signup failed');
       }
     } catch (error) {
       console.error("There was an error during signup", error);
+      setError(error.message); // Set the error state with the error message
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleSignup();
+    setError(null); // Reset error state
+    try {
+      handleSignup();
+    } catch (error) {
+      console.error("There was an error during signup 123", error);
+      setError(error.message); // Set the error state with the error message
+    }
   };
 
 
@@ -110,77 +110,7 @@ const Signup = () => {
               placeholder="Password"
             />
           </div>
-          <div className="mb-4">
-            <span className="text-md font-bold">Full Name</span>
-            <input
-              type="text"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md mt-2"
-              placeholder="Full Name"
-            />
-          </div>
-          <div className="mb-4">
-            <span className="text-md font-bold">Phone</span>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md mt-2"
-              placeholder="Phone"
-            />
-          </div>
-          <div className="mb-4">
-            <span className="text-md font-bold">Address</span>
-            <input
-              type="text"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md mt-2"
-              placeholder="Address"
-            />
-          </div>
-          <div className="mb-6">
-            <span className="text-md font-bold">Role</span>
-            <div className="mt-2">
-              <label className="inline-flex items-center mr-6">
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="user"
-                  checked={formData.role === 'user'}
-                  onChange={handleChange}
-                  className="form-radio h-5 w-5 text-gray-600"
-                />
-                <span className="ml-2">User</span>
-              </label>
-              <label className="inline-flex items-center mr-6">
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="driver"
-                  checked={formData.role === 'driver'}
-                  onChange={handleChange}
-                  className="form-radio h-5 w-5 text-gray-600"
-                />
-                <span className="ml-2">Driver</span>
-              </label>
-              <label className="inline-flex items-center">
-                <input 
-                  type="radio" 
-                  name="role" 
-                  value="admin"
-                  checked={formData.role === 'admin'}
-                  onChange={handleChange}
-                  className="form-radio h-5 w-5 text-gray-600"
-                />
-                <span className="ml-2">Admin</span>
-              </label>
-            </div>
-          </div>
+   
           <button type="submit" className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600">
           Sign up
           </button>
