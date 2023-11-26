@@ -1,33 +1,32 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
-import { UserContext } from "../context/UserContext"; 
+import { UserContext } from "../context/UserContext";
 
 const Signup = () => {
   const { updateUser, setIsAuthenticated } = useContext(UserContext);
   const [, setError] = useState(null); // State to hold error information
 
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
-
     const { name, value } = e.target;
-    const newValue = name === 'username' ? value.toLowerCase() : value;
-  
+    const newValue = name === "username" ? value.toLowerCase() : value;
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: newValue,
     }));
   };
-  
-  console.log("Before sending ",formData);
+
+  console.log("Before sending ", formData);
   const handleSignup = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5005/api/users", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -43,11 +42,11 @@ const Signup = () => {
         updateUser({ ...data.user });
         setIsAuthenticated(true);
         // Update local storage
-        localStorage.setItem("user", JSON.stringify({ ...data.user}));
+        localStorage.setItem("user", JSON.stringify({ ...data.user }));
         localStorage.setItem("isAuthenticated", JSON.stringify(true));
       } else {
         const errorData = await response.json(); // Get error details from the response
-        throw new Error(errorData.message || 'Signup failed');
+        throw new Error(errorData.message || "Signup failed");
       }
     } catch (error) {
       console.error("There was an error during signup", error);
@@ -66,11 +65,13 @@ const Signup = () => {
     }
   };
 
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="relative flex flex-col m-6 space-y-8 bg-white shadow-2xl rounded-2xl md:flex-row md:space-y-0">
-        <form className="flex flex-col justify-center p-8 md:p-14" onSubmit={handleSubmit}>
+        <form
+          className="flex flex-col justify-center p-8 md:p-14"
+          onSubmit={handleSubmit}
+        >
           <span className="mb-3 text-4xl font-bold">
             Welcome to Speedy-Delivery
           </span>
@@ -110,11 +111,17 @@ const Signup = () => {
               placeholder="Password"
             />
           </div>
-   
-          <button type="submit" className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600">
-          Sign up
+
+          <button
+            type="submit"
+            className="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600"
+          >
+            Sign up
           </button>
-          <Link to="/signin" className="text-center text-red-500 hover:text-red-600">
+          <Link
+            to="/signin"
+            className="text-center text-red-500 hover:text-red-600"
+          >
             Already have an account? Sign in
           </Link>
         </form>
@@ -129,6 +136,6 @@ const Signup = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Signup;
