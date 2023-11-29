@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const ParcelForm = () => {
+const ParcelForm = ({ sendParcelAndGetCode }) => {
   const [formData, setFormData] = useState({
     description: "",
     weight: "",
@@ -72,6 +72,11 @@ const ParcelForm = () => {
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      //get code from robot
+      if (response.ok) {
+        sendParcelAndGetCode();
       }
 
       const result = await response.json();

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"; // Import Link for navigation
 import { UserContext } from "../context/UserContext";
 
 const Signup = () => {
-  const { updateUser, setIsAuthenticated } = useContext(UserContext);
+  const { updateUser, setIsAuthenticated, setUser } = useContext(UserContext);
   const [, setError] = useState(null); // State to hold error information
 
   const [formData, setFormData] = useState({
@@ -40,6 +40,8 @@ const Signup = () => {
         console.log("User", data.user);
         // Update user state using updateUser from Context
         updateUser({ ...data.user });
+        //setuser
+        setUser({ ...data.user });
         setIsAuthenticated(true);
         // Update local storage
         localStorage.setItem("user", JSON.stringify({ ...data.user }));
