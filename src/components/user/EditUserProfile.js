@@ -36,7 +36,7 @@ const EditUserProfile = () => {
         const user = JSON.parse(userString);
         const token = user.token;
         console.log('Token:', token); // Debugging
-        const response = await fetch(`http://localhost:5000/api/users/${editUser.userId}`, {
+        const response = await fetch(`http://localhost:5005/api/users/${editUser.userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

@@ -21,7 +21,7 @@ import AccountDeletion from "./components/user/ AccountDeletion";
 
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:9000");
+const socket = io(`http://localhost:5005`);
 console.log(socket);
 
 const App = () => {

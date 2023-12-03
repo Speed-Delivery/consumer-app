@@ -9,7 +9,7 @@ const AccountDeletion = () => {
       // get token
       const token = JSON.parse(localStorage.getItem('user')).token;
       console.log('Token:', token); // Debugging
-      const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+      const response = await fetch(`http://localhost:5005/api/users/${userId}`, {
         method: 'DELETE', // Specify the DELETE method for the request
         headers: {
           'Content-Type': 'application/json',
