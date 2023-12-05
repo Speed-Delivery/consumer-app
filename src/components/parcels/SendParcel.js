@@ -6,6 +6,7 @@ import emailjs from "@emailjs/browser";
 const ParcelForm = () => {
   const [cabinetNumber, setCabinetNumber] = useState("");
   const [accessCode, setAccessCode] = useState("");
+  const [cabinetId, setCabinetId] = useState(""); // You can store the cabinet id here
   const [formData, setFormData] = useState({
     description: "",
     weight: "",
@@ -73,8 +74,6 @@ const ParcelForm = () => {
       },
     };
 
-    console.log(parcelData);
-
     try {
       const response = await fetch("http://localhost:5005/api/parcels", {
         method: "POST",
@@ -90,8 +89,62 @@ const ParcelForm = () => {
 
       const result = await response.json();
       console.log("Parcel sent successfully:", result);
+      // Create a transaction for the parcel
+      const transaction = await createTransaction(result.parcel._id);
+      console.log("Transaction created successfully:", transaction);
     } catch (error) {
       console.error("There was a problem sending the parcel:", error);
+    }
+  };
+
+  const createTransaction = async (parcelId) => {
+    try {
+      const transactionResponse = await fetch(
+        "http://localhost:5005/api/transactions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ parcelId }), // Sending only parcelId as required
+        }
+      );
+
+      if (!transactionResponse.ok) {
+        throw new Error(`HTTP error! status: ${transactionResponse.status}`);
+      }
+
+      const transactionResult = await transactionResponse.json();
+      console.log("Transaction created successfully:", transactionResult);
+      return transactionResult;
+    } catch (error) {
+      console.error("There was a problem creating the transaction:", error);
+    }
+  };
+
+  //create an put api call to update the transaction to insert the cabinet id and access code
+  const updateTransaction = async (transactionId) => {
+    try {
+      const transactionResponse = await fetch(
+        `http://localhost:5005/api/transactions/${transactionId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cabinetId, accessCode }), // Sending only parcelId as required
+        }
+      );
+
+      if (!transactionResponse.ok) {
+        throw new Error(`HTTP error! status: ${transactionResponse.status}`);
+      }
+
+      const transactionResult = await transactionResponse.json();
+      console.log("Transaction created successfully:", transactionResult);
+      return transactionResult;
+    } catch (error) {
+      console.error("There was a problem creating the transaction:", error);
     }
   };
 
@@ -169,16 +222,18 @@ const ParcelForm = () => {
     if (availableCabinets.length > 0) {
       const randomIndex = Math.floor(Math.random() * availableCabinets.length);
       const selectedCabinet = availableCabinets[randomIndex];
-      console.log(
-        `Sender Cabinet: Door Number - ${selectedCabinet.cabinetNumber}, Code - ${selectedCabinet.code}`
-      );
       setCabinetNumber(selectedCabinet.cabinetNumber);
       setAccessCode(selectedCabinet.code);
+      setCabinetId(selectedCabinet.id);
+      console.log(
+        `Sender Cabinet: Id - ${cabinetId}, Door Number - ${cabinetNumber}, Code - ${accessCode}`
+      );
     } else {
       alert("No available cabinets pls wait until the cabinets are freed up.");
     }
 
-    return availableCabinets; // You can still return the cabinets if needed elsewhere
+    // You can still return the selected cabinet id
+    return cabinetId;
   }
 
   const sendEmail = () => {
@@ -217,7 +272,8 @@ const ParcelForm = () => {
     if (isValid) {
       await fetchAndFilterCabinets(senderCity);
       sendEmail(); // Send email with cabinet number and access code
-      sendParcel(); // Only call sendParcel if all validations pass
+      const parcelId = await sendParcel();
+      console.log("this is the parcel that is being created", parcelId); // Only call sendParcel if all validations pass
     }
 
     // clearForm();
