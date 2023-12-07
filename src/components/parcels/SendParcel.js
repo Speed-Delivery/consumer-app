@@ -6,7 +6,9 @@ import emailjs from "@emailjs/browser";
 const ParcelForm = () => {
   const [cabinetNumber, setCabinetNumber] = useState("");
   const [accessCode, setAccessCode] = useState("");
-  const [cabinetId, setCabinetId] = useState(""); // You can store the cabinet id here
+  const [cabinetId, setCabinetId] = useState("");
+  const [senderCity, setSenderCity] = useState("");
+  const [recipientCity, setRecipientCity] = useState("");
   const [formData, setFormData] = useState({
     description: "",
     weight: "",
@@ -25,23 +27,19 @@ const ParcelForm = () => {
 
   const validateAddress = (address) => {
     const cities = ["Helsinki", "Espoo", "Tampere", "Vantaa", "Oulu"];
-    let foundCity = ""; // Variable to store the matched city
+    let foundCity = "";
 
-    // Splitting the address into components
     const addressParts = address
       .trim()
       .split(" ")
       .map((part) => part.trim());
-
-    // Checking if any part of the address matches a city in the list
     for (let part of addressParts) {
       if (cities.includes(part)) {
         foundCity = part;
-        break; // Stop the loop as only one city is expected
+        break;
       }
     }
 
-    // Return the city if found, false otherwise
     return foundCity !== "" ? foundCity : false;
   };
 
@@ -89,15 +87,17 @@ const ParcelForm = () => {
 
       const result = await response.json();
       console.log("Parcel sent successfully:", result);
-      // Create a transaction for the parcel
-      const transaction = await createTransaction(result.parcel._id);
-      console.log("Transaction created successfully:", transaction);
+      return result.parcel._id;
     } catch (error) {
       console.error("There was a problem sending the parcel:", error);
     }
   };
 
-  const createTransaction = async (parcelId) => {
+  const createTransaction = async (
+    parcelId,
+    CabinetId,
+    parcelStatus = "waiting to be placed"
+  ) => {
     try {
       const transactionResponse = await fetch(
         "http://localhost:5005/api/transactions",
@@ -106,33 +106,7 @@ const ParcelForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ parcelId }), // Sending only parcelId as required
-        }
-      );
-
-      if (!transactionResponse.ok) {
-        throw new Error(`HTTP error! status: ${transactionResponse.status}`);
-      }
-
-      const transactionResult = await transactionResponse.json();
-      console.log("Transaction created successfully:", transactionResult);
-      return transactionResult;
-    } catch (error) {
-      console.error("There was a problem creating the transaction:", error);
-    }
-  };
-
-  //create an put api call to update the transaction to insert the cabinet id and access code
-  const updateTransaction = async (transactionId) => {
-    try {
-      const transactionResponse = await fetch(
-        `http://localhost:5005/api/transactions/${transactionId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ cabinetId, accessCode }), // Sending only parcelId as required
+          body: JSON.stringify({ parcelId, CabinetId, parcelStatus }),
         }
       );
 
@@ -159,91 +133,47 @@ const ParcelForm = () => {
       return await response.json();
     } catch (error) {
       console.error(
-        "There was a problem fetching the available couriers:",
+        "There was a problem fetching the available lockers:",
         error
       );
     }
   };
 
-  const clearForm = () => {
-    setFormData({
-      description: "",
-      weight: "",
-      length: "",
-      width: "",
-      height: "",
-      senderName: "",
-      senderAddress: "",
-      senderPhone: "",
-      senderEmail: "",
-      recipientName: "",
-      recipientAddress: "",
-      recipientPhone: "",
-      recipientEmail: "",
-    });
-  };
-
-  // Function to validate addresses
-  function validateAddresses(formData) {
-    let isValid = true;
-    let senderCity = validateAddress(formData.senderAddress);
-    let recipientCity = validateAddress(formData.recipientAddress);
-
-    if (!senderCity) {
-      alert(
-        "Sender address is invalid. Please ensure it includes a valid city."
-      );
-      isValid = false;
-    }
-    console.log("Sender address is " + senderCity);
-
-    if (!recipientCity) {
-      alert(
-        "Recipient address is invalid. Please ensure it includes a valid city."
-      );
-      isValid = false;
-    }
-    console.log("Recipient address is " + recipientCity);
-
-    return { isValid, senderCity, recipientCity };
-  }
-
-  async function fetchAndFilterCabinets(city) {
+  const fetchAndFilterCabinets = async (city) => {
     const cabinetsData = await fetchCabinets(city);
     let availableCabinets = [];
-    cabinetsData.lockers.forEach((locker) => {
-      let available = locker.cabinets.filter(
-        (cabinet) => cabinet.status === "available"
-      );
-      availableCabinets.push(...available);
-    });
 
-    // Randomly select and log a cabinet if there are any available
-    if (availableCabinets.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableCabinets.length);
-      const selectedCabinet = availableCabinets[randomIndex];
-      setCabinetNumber(selectedCabinet.cabinetNumber);
-      setAccessCode(selectedCabinet.code);
-      setCabinetId(selectedCabinet.id);
-      console.log(
-        `Sender Cabinet: Id - ${cabinetId}, Door Number - ${cabinetNumber}, Code - ${accessCode}`
-      );
-    } else {
-      alert("No available cabinets pls wait until the cabinets are freed up.");
+    if (cabinetsData && cabinetsData.lockers) {
+      cabinetsData.lockers.forEach((locker) => {
+        let available = locker.cabinets.filter(
+          (cabinet) => cabinet.status === "available"
+        );
+        availableCabinets.push(...available);
+      });
+
+      if (availableCabinets.length > 0) {
+        const randomIndex = Math.floor(
+          Math.random() * availableCabinets.length
+        );
+        const selectedCabinet = availableCabinets[randomIndex];
+        setCabinetNumber(selectedCabinet.cabinetNumber);
+        setAccessCode(selectedCabinet.code);
+        setCabinetId(selectedCabinet.id);
+      } else {
+        console.log("No available cabinets.");
+      }
     }
 
-    // You can still return the selected cabinet id
-    return cabinetId;
-  }
+    return availableCabinets.length > 0 ? cabinetId : null;
+  };
 
   const sendEmail = () => {
     const emailData = {
       to_name: formData.recipientName,
       from_name: "Speedy_Delivery",
-      message: "Your parcel is ready to be placed in the cabinet.", // Example message, modify as needed
+      message: "Your parcel is ready to be placed in the cabinet.",
       cabinet_number: cabinetNumber,
       access_code: accessCode,
-      // Include other necessary data if needed
     };
 
     emailjs
@@ -263,20 +193,62 @@ const ParcelForm = () => {
       );
   };
 
-  // The handleSubmit function remains the same
+  const validateAddresses = () => {
+    let isValid = true;
+    const senderCityFound = validateAddress(formData.senderAddress);
+    const recipientCityFound = validateAddress(formData.recipientAddress);
+
+    setSenderCity(senderCityFound || "");
+    setRecipientCity(recipientCityFound || "");
+
+    if (!senderCityFound) {
+      alert(
+        "Sender address is invalid. Please ensure it includes a valid city."
+      );
+      isValid = false;
+    }
+
+    if (!recipientCityFound) {
+      alert(
+        "Recipient address is invalid. Please ensure it includes a valid city."
+      );
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { isValid, senderCity } = validateAddresses(formData);
-
-    if (isValid) {
-      await fetchAndFilterCabinets(senderCity);
-      sendEmail(); // Send email with cabinet number and access code
-      const parcelId = await sendParcel();
-      console.log("this is the parcel that is being created", parcelId); // Only call sendParcel if all validations pass
+    if (!validateAddresses()) {
+      alert(
+        "Address validation failed. Please check the addresses and try again."
+      );
+      return;
     }
 
-    // clearForm();
+    try {
+      const selectedCabinetId = await fetchAndFilterCabinets(senderCity);
+      if (!selectedCabinetId) {
+        alert(
+          "No available cabinets. Please wait until the cabinets are freed up."
+        );
+        return;
+      }
+
+      const parcelId = await sendParcel();
+      if (!parcelId) {
+        throw new Error("Failed to send parcel data");
+      }
+
+      await createTransaction(parcelId, selectedCabinetId);
+      sendEmail(); // Send cabinet information to the user
+      alert("Parcel submission process completed successfully.");
+    } catch (error) {
+      console.error("Error in handling the parcel submission:", error);
+      alert("There was an issue processing your request. Please try again.");
+    }
   };
 
   return (
