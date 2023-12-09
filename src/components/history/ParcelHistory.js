@@ -1,92 +1,116 @@
 import React, { useContext, useEffect, useState } from "react";
-
 import { UserContext } from "../context/UserContext";
 
 const ParcelHistory = () => {
   const { user } = useContext(UserContext);
-  console.log(user, "from parcel history");
 
-  const [data, setData] = useState([]);
+  const [parcels, setParcels] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
+  // Define userId outside of useEffect
+  const userId =
+    user && user._id ? user._id : JSON.parse(localStorage.getItem("user"))._id;
+
   useEffect(() => {
-    // Make a GET request to fetch the array of objects
-    fetch("http://localhost:5005/api/parcels") // Replace with your API endpoint
+    // Fetch parcels
+    fetch("http://localhost:5005/api/parcels")
       .then((response) => response.json())
       .then((result) => {
-        console.log(result, "result after response");
-
-        // Check if the result has a 'parcels' property
         if (result.parcels && Array.isArray(result.parcels)) {
-          const parcelsArray = result.parcels;
-
-          // Filter the data based on the specified conditions
-          const filteredResult = parcelsArray.filter((item) => {
-            // Example: Filter based on sender's name and email
-            return (
-              (item.sender &&
-                item.sender.name === user.username &&
-                item.sender.email === user.email) ||
-              (item.recipient &&
-                item.recipient.name === user.username &&
-                item.recipient.email === user.email)
-            );
-          });
-
-          setData(parcelsArray);
-          setFilteredData(filteredResult);
-          console.log(filteredResult, "filtered result");
+          setParcels(result.parcels);
         } else {
           console.error("Unexpected data structure:", result);
         }
       })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, [user]);
-  // Function to format the date
-  // Function to format the date
-  const formatCreatedAt = (createdAt) => {
-    const createdAtDate = new Date(createdAt);
+      .catch((error) => console.error("Error fetching parcels:", error));
 
-    // Format the date components manually
-    const year = createdAtDate.getFullYear();
-    const month = String(createdAtDate.getMonth() + 1).padStart(2, "0");
-    const day = String(createdAtDate.getDate()).padStart(2, "0");
-    const hours = String(createdAtDate.getHours()).padStart(2, "0");
-    const minutes = String(createdAtDate.getMinutes()).padStart(2, "0");
-    const seconds = String(createdAtDate.getSeconds()).padStart(2, "0");
+    // Fetch transactions
+    fetch("http://localhost:5005/api/transactions")
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.transactions && Array.isArray(result.transactions)) {
+          setTransactions(result.transactions);
+        } else {
+          console.error("Unexpected data structure:", result);
+        }
+      })
+      .catch((error) => console.error("Error fetching transactions:", error));
+  }, []);
 
-    // Create the formatted date string
-    const formattedDateString = `${day}-${month}-${year} `;
+  // Match parcels with transactions
+  useEffect(() => {
+    if (parcels.length && transactions.length) {
+      const matchedData = parcels
+        .filter((parcel) => parcel.sender && parcel.sender.user === userId)
+        .map((parcel) => {
+          const transaction = transactions.find(
+            (tran) => tran.parcelId === parcel._id
+          );
+          return { ...parcel, transaction };
+        });
 
-    return formattedDateString;
-  };
+      setFilteredData(matchedData);
+    }
+  }, [parcels, transactions, userId]);
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className=" text-4xl font-bold text-center my-8">
+      <h2 className="text-4xl font-bold text-center my-8 text-blue-600">
         Parcel Information and History
       </h2>
-      <div className="mt-4">
-        {filteredData.map((parcel, index) => (
-          <div key={index} className="border rounded p-4 mb-4">
-            <p>
-              <strong>Sender:</strong> {parcel.sender.name}
-            </p>
-            <p>
-              <strong>Recipient:</strong> {parcel.recipient.name}
-            </p>
-            <p>
-              <strong>Weight:</strong> {parcel.parcelWeight}
-            </p>
-            <p>
-              <strong>Sent at:</strong>
-              {formatCreatedAt(parcel.createdAt)}
-            </p>
-            <p>
-              <strong>Description:</strong> {parcel.parcelDescription}
-            </p>
-          </div>
-        ))}
+      <div>
+        {filteredData.length > 0 ? (
+          filteredData.map((item, index) => (
+            <div
+              key={index}
+              className="mb-6 p-5 border rounded-lg shadow-lg bg-white hover:shadow-xl transition-shadow"
+            >
+              <h3 className="text-2xl font-semibold text-purple-700 mb-2">
+                Parcel {index + 1}
+              </h3>
+              <div className="parcel-info">
+                <p>
+                  <strong>Sender:</strong> {item.sender.name}
+                </p>
+                <p>
+                  <strong>Sender Address:</strong> {item.sender.address}
+                </p>
+                <p>
+                  <strong>Recipient:</strong> {item.recipient.name}
+                </p>
+                <p>
+                  <strong>Recipient Address:</strong> {item.recipient.address}
+                </p>
+              </div>
+              {item.transaction && (
+                <div className="transaction-info">
+                  <h4 className="text-xl font-semibold text-green-700 mt-4 mb-2">
+                    Transaction Details
+                  </h4>
+                  <p>
+                    <strong>Parcel Status:</strong>{" "}
+                    {item.transaction.parcelStatus}
+                  </p>
+                  <p>
+                    <strong>Created At:</strong>{" "}
+                    {new Date(item.transaction.createdAt).toLocaleDateString()}
+                  </p>
+                  <p>
+                    <strong>Last Updated:</strong>{" "}
+                    {new Date(
+                      item.transaction.transactionStatusLastUpdated
+                    ).toLocaleDateString()}
+                  </p>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">
+            No parcel history available.
+          </p>
+        )}
       </div>
     </div>
   );
