@@ -159,6 +159,7 @@ const ParcelForm = () => {
         setCabinetNumber(selectedCabinet.cabinetNumber);
         setAccessCode(selectedCabinet.code);
         setCabinetId(selectedCabinet.id);
+        console.log("Available cabinets:", cabinetNumber, accessCode);
       } else {
         console.log("No available cabinets.");
       }
@@ -169,7 +170,7 @@ const ParcelForm = () => {
 
   const sendEmail = () => {
     const emailData = {
-      to_name: formData.recipientName,
+      to_name: formData.senderName,
       from_name: "Speedy_Delivery",
       message: "Your parcel is ready to be placed in the cabinet.",
       cabinet_number: cabinetNumber,
