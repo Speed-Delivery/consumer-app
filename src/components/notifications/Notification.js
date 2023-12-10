@@ -1,79 +1,130 @@
-import { filter } from 'lodash';
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-
+import React, { useState, useEffect } from 'react';
+import NotificationCard from './NotificationCard'; // Import the component
+ 
 const Notification = () => {
-  const [userParcels, setUserParcels] = useState([]);
-  const [userLockers, setUserLockers] = useState([]);
-
+  const [parcels, setParcels] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [lockers, setLockers] = useState([]);
+  const [matchingData, setMatchingData] = useState({
+    matchingParcels: [],
+    matchingTransactions: [],
+    matchingLockers: [],
+    matchingCabinets: [],
+  });
+ 
   useEffect(() => {
-    const socket = io('http://localhost:5005'); // Replace with your server URL
-
-    // Get the user ID from local storage
-    const userId = JSON.parse(localStorage.getItem('user'))._id;
-   
-    if (userId) {
-      socket.emit('getUserParcels', userId);
-      console.log('User ID sent to server', userId); // Debugging
-      socket.on('userParcels', (receivedUserParcels) => {
-        setUserParcels(receivedUserParcels);
-      });
-      socket.emit('getUserLockers');
-      socket.on('userLockers', (receivedLockers) => {
-        setUserLockers(receivedLockers);
-      });
-    } else {
-      console.error('User ID not found in local storage');
-    }
-
-    return () => {
-      socket.disconnect();
-    };
+    // Step 1: Retrieve the user ID from local storage
+    const userId = JSON.parse(localStorage.getItem("user"))._id;
+ 
+    // Step 2: Fetch parcels where the current user is the sender
+    fetch("http://localhost:5005/api/parcels")
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.parcels && Array.isArray(result.parcels)) {
+          // Filter parcels where the current user is the sender
+          const filteredResult = result.parcels.filter((parcel) => {
+            return parcel.sender && parcel.sender.user === userId;
+          });
+ 
+          setParcels(filteredResult); // Set filtered parcel data
+        } else {
+          console.error("Unexpected data structure for parcels:", result);
+        }
+      })
+      .catch((error) => console.error("Error fetching parcels data:", error));
+  }, []); // Empty dependency array means this effect runs once after initial render
+ 
+  useEffect(() => {
+    // Step 3: Fetch all transactions
+    fetch("http://localhost:5005/api/transactions/")
+    .then((response) => response.json())
+    .then((transactionData) => {
+      console.log("Fetched transactions:", transactionData.transactions); // Add this line
+      if (Array.isArray(transactionData.transactions)) {
+        setTransactions(transactionData.transactions);
+      } else {
+        console.error("Transaction data is not an array:", transactionData);
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching transaction data:", error);
+    });
+  
   }, []);
  
-  
-  // Function to get the cabinet object by parcel ID
-  const getCabinetByParcelId = (userLockers, parcelId) => {
-    for (const obj of userLockers) {
-      for (const cabinet of obj.cabinets) {
-        if (cabinet.currentParcel === parcelId) {
-          return cabinet;
-        }
-      }
+  useEffect(() => {
+    // Step 4: Fetch lockers data
+    fetchLockers();
+  }, [parcels]);
+ 
+  const fetchLockers = async () => {
+    const response = await fetch("http://localhost:5005/api/lockers");
+    const data = await response.json();
+    if (data && Array.isArray(data.lockers)) {
+      setLockers(data.lockers);
+    } else {
+      console.error("Data is not in the expected format:", data);
     }
-    return null;
   };
-
-  // create an array of user parcel IDs
-  const userParcelIds = userParcels.map(parcel => parcel._id);
-  // for each uesrParcelid find the cabinert object
-  const userCabinets = userParcelIds.map(parcelId => getCabinetByParcelId(userLockers, parcelId));
+ 
+  useEffect(() => {
+    // Step 5: Match cabinets to lockers
+    if (parcels.length > 0 && lockers.length > 0) {
+      const parcelCabinetMapping = {
+        matchingParcels: [],
+        matchingTransactions: [],
+        matchingLockers: [],
+        matchingCabinets: [],
+      };
+ 
+      transactions.forEach((transaction) => {
+        // Check if the transaction status is 'awaiting pickup'
+        if (transaction.parcelStatus === "awaiting pickup") {
+          const parcelId = transaction.parcelId;
+          const cabinetId = transaction.CabinetId;
+      
+          const matchingParcel = parcels.find((parcel) => parcel._id === parcelId);
+      
+          if (matchingParcel) {
+            const lockerId = lockers.find((locker) =>
+              locker.cabinets.some((cabinet) => cabinet.id === cabinetId)
+            )?.id;
+      
+            if (lockerId) {
+              const matchingCabinet = lockers
+                .find((locker) => locker.id === lockerId)
+                .cabinets.find((cabinet) => cabinet.id === cabinetId);
+      
+              if (matchingCabinet) {
+                parcelCabinetMapping.matchingCabinets.push({
+                  ...matchingCabinet,
+                  transactionStatus: transaction.parcelStatus
+                });
+              }
+            }
+          }
+        }
+      });
+ 
+      setMatchingData(parcelCabinetMapping);
+    }
+  }, [parcels, lockers, transactions]);
+ 
   return (
-    <>
-      {userCabinets.length > 0 && (
-        <div className="bg-gray-100 flex justify-center items-center min-h-screen">
-          <div className="bg-white shadow-2xl rounded-2xl p-4 w-8/12 max-w-md">
-            <h1 className="text-center font-semibold text-2xl py-2">
-              Notifications
-            </h1>
-            <div className="flex justify-center items-center space-x-4 py-4">
-              {userCabinets.map((cabinet) => (
-                cabinet && cabinet._id ? ( // Check if cabinet exists and has _id property
-                  <div className="bg-white shadow-2xl rounded-2xl p-4 w-8/12 max-w-md" key={cabinet._id}>
-                    <p className="text-center py-2">Cabinet ID: {cabinet._id}</p>
-                    <p className="text-center py-2">Parcel ID: {cabinet.currentParcel}</p>
-                    <p className="text-center py-2">Parcel Code: {cabinet.currentParcelCode}</p>
-                    <p className="text-center py-2">Parcel Size: {cabinet.currentParcelSize}</p>
-                    <p className="text-center py-2">Parcel Status: {cabinet.currentParcelStatus}</p>
-                  </div>
-                ) : null
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );  
+    <div>
+      <NotificationCard
+        title="Matching Cabinets"
+        items={matchingData.matchingCabinets.map((cabinet) => ({
+          cabinetNumber: cabinet.cabinetNumber,
+          status: cabinet.transactionStatus,
+          code: cabinet.code,
+          cabinetStatusLastUpdated: cabinet.cabinetStatusLastUpdated,
+        }))}
+      />
+    </div>
+  );
 };
-
+ 
 export default Notification;
+ 
+ 
