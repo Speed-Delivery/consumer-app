@@ -27,22 +27,16 @@ const ParcelForm = () => {
 
   const validateAddress = (address) => {
     const cities = ["Helsinki", "Espoo", "Tampere", "Vantaa", "Oulu"];
-    let foundCity = "";
-
-    const addressParts = address
-      .trim()
-      .split(" ")
-      .map((part) => part.trim());
-    for (let part of addressParts) {
-      if (cities.includes(part)) {
-        foundCity = part;
-        break;
-      }
-    }
-
-    return foundCity !== "" ? foundCity : false;
+    // Split the address by comma and trim any whitespace
+    const addressParts = address.split(',').map(part => part.trim());
+  
+    // The city should be after the comma, which would make it the second part of the split, if it exists
+    const city = addressParts.length > 1 ? addressParts[1] : "";
+  
+    // Check if the city is in the list of valid cities
+    return cities.includes(city) ? city : false;
   };
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -140,6 +134,7 @@ const ParcelForm = () => {
   };
 
   const fetchAndFilterCabinets = async (city) => {
+    console.log("Fetching cabinets for city:", city);
     const cabinetsData = await fetchCabinets(city);
     let availableCabinets = [];
   
@@ -150,12 +145,13 @@ const ParcelForm = () => {
         );
         availableCabinets.push(...available);
       });
-  
+      console.log("Available length:", availableCabinets.length);
       if (availableCabinets.length > 0) {
         const randomIndex = Math.floor(
           Math.random() * availableCabinets.length
         );
         const selectedCabinet = availableCabinets[randomIndex];
+        console.log("Random index:", randomIndex);
         console.log("Selected cabinet:", selectedCabinet);
         return {
           cabinetNumber: selectedCabinet.cabinetNumber,
@@ -228,8 +224,16 @@ const ParcelForm = () => {
       return;
     }
   
+    // Use the city directly from the form data
+    const senderCityFromForm = validateAddress(formData.senderAddress);
+  
     try {
-      const cabinetDetails = await fetchAndFilterCabinets(senderCity);
+      if (!senderCityFromForm) {
+        alert("Invalid sender city. Please check the sender address and try again.");
+        return;
+      }
+  
+      const cabinetDetails = await fetchAndFilterCabinets(senderCityFromForm);
       if (!cabinetDetails) {
         alert("No available cabinets. Please wait until the cabinets are freed up.");
         return;
@@ -240,6 +244,7 @@ const ParcelForm = () => {
       setAccessCode(cabinetDetails.accessCode);
       setCabinetId(cabinetDetails.cabinetId);
       console.log("Cabinet details:", cabinetDetails.accessCode);
+  
       const parcelId = await sendParcel();
       if (!parcelId) {
         throw new Error("Failed to send parcel data");
@@ -253,6 +258,7 @@ const ParcelForm = () => {
       alert("There was an issue processing your request. Please try again.");
     }
   };
+  
   
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
