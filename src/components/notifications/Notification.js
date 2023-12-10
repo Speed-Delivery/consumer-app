@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import NotificationCard from './NotificationCard'; // Import the component
- 
+import React, { useState, useEffect } from "react";
+import NotificationCard from "./NotificationCard"; // Import the component
+
 const Notification = () => {
   const [parcels, setParcels] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -11,11 +11,11 @@ const Notification = () => {
     matchingLockers: [],
     matchingCabinets: [],
   });
- 
+
   useEffect(() => {
     // Step 1: Retrieve the user ID from local storage
     const userId = JSON.parse(localStorage.getItem("user"))._id;
- 
+
     // Step 2: Fetch parcels where the current user is the sender
     fetch("http://localhost:5005/api/parcels")
       .then((response) => response.json())
@@ -25,7 +25,7 @@ const Notification = () => {
           const filteredResult = result.parcels.filter((parcel) => {
             return parcel.sender && parcel.sender.user === userId;
           });
- 
+
           setParcels(filteredResult); // Set filtered parcel data
         } else {
           console.error("Unexpected data structure for parcels:", result);
@@ -33,30 +33,29 @@ const Notification = () => {
       })
       .catch((error) => console.error("Error fetching parcels data:", error));
   }, []); // Empty dependency array means this effect runs once after initial render
- 
+
   useEffect(() => {
     // Step 3: Fetch all transactions
     fetch("http://localhost:5005/api/transactions/")
-    .then((response) => response.json())
-    .then((transactionData) => {
-      console.log("Fetched transactions:", transactionData.transactions); // Add this line
-      if (Array.isArray(transactionData.transactions)) {
-        setTransactions(transactionData.transactions);
-      } else {
-        console.error("Transaction data is not an array:", transactionData);
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching transaction data:", error);
-    });
-  
+      .then((response) => response.json())
+      .then((transactionData) => {
+        console.log("Fetched transactions:", transactionData.transactions); // Add this line
+        if (Array.isArray(transactionData.transactions)) {
+          setTransactions(transactionData.transactions);
+        } else {
+          console.error("Transaction data is not an array:", transactionData);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching transaction data:", error);
+      });
   }, []);
- 
+
   useEffect(() => {
     // Step 4: Fetch lockers data
     fetchLockers();
   }, [parcels]);
- 
+
   const fetchLockers = async () => {
     const response = await fetch("http://localhost:5005/api/lockers");
     const data = await response.json();
@@ -66,7 +65,7 @@ const Notification = () => {
       console.error("Data is not in the expected format:", data);
     }
   };
- 
+
   useEffect(() => {
     // Step 5: Match cabinets to lockers
     if (parcels.length > 0 && lockers.length > 0) {
@@ -76,40 +75,50 @@ const Notification = () => {
         matchingLockers: [],
         matchingCabinets: [],
       };
- 
+
       transactions.forEach((transaction) => {
         // Check if the transaction status is 'awaiting pickup'
-        if (transaction.parcelStatus === "awaiting pickup") {
+        if (
+          transaction.parcelStatus === "waiting to be placed" ||
+          transaction.parcelStatus === "awaiting pickup" ||
+          transaction.parcelStatus === "in transit" ||
+          transaction.parcelStatus === "delivered" ||
+          transaction.parcelStatus === "picked up"
+        ) {
           const parcelId = transaction.parcelId;
           const cabinetId = transaction.CabinetId;
-      
-          const matchingParcel = parcels.find((parcel) => parcel._id === parcelId);
-      
+
+          const matchingParcel = parcels.find(
+            (parcel) => parcel._id === parcelId
+          );
+
           if (matchingParcel) {
             const lockerId = lockers.find((locker) =>
               locker.cabinets.some((cabinet) => cabinet.id === cabinetId)
             )?.id;
-      
+
             if (lockerId) {
               const matchingCabinet = lockers
                 .find((locker) => locker.id === lockerId)
                 .cabinets.find((cabinet) => cabinet.id === cabinetId);
-      
+
               if (matchingCabinet) {
                 parcelCabinetMapping.matchingCabinets.push({
                   ...matchingCabinet,
-                  transactionStatus: transaction.parcelStatus
+                  transactionStatus: transaction.parcelStatus,
                 });
               }
             }
           }
         }
       });
- 
+
       setMatchingData(parcelCabinetMapping);
     }
   }, [parcels, lockers, transactions]);
- 
+
+  console.log("Matching Data:", matchingData.matchingCabinets);
+
   return (
     <div>
       <NotificationCard
@@ -124,7 +133,5 @@ const Notification = () => {
     </div>
   );
 };
- 
+
 export default Notification;
- 
- 

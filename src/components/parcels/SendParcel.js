@@ -28,15 +28,15 @@ const ParcelForm = () => {
   const validateAddress = (address) => {
     const cities = ["Helsinki", "Espoo", "Tampere", "Vantaa", "Oulu"];
     // Split the address by comma and trim any whitespace
-    const addressParts = address.split(',').map(part => part.trim());
-  
+    const addressParts = address.split(",").map((part) => part.trim());
+
     // The city should be after the comma, which would make it the second part of the split, if it exists
     const city = addressParts.length > 1 ? addressParts[1] : "";
-  
+
     // Check if the city is in the list of valid cities
     return cities.includes(city) ? city : false;
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -137,7 +137,7 @@ const ParcelForm = () => {
     console.log("Fetching cabinets for city:", city);
     const cabinetsData = await fetchCabinets(city);
     let availableCabinets = [];
-  
+
     if (cabinetsData && cabinetsData.lockers) {
       cabinetsData.lockers.forEach((locker) => {
         let available = locker.cabinets.filter(
@@ -156,15 +156,16 @@ const ParcelForm = () => {
         return {
           cabinetNumber: selectedCabinet.cabinetNumber,
           accessCode: selectedCabinet.code,
-          cabinetId: selectedCabinet.id
+          cabinetId: selectedCabinet.id,
         };
       } else {
         console.log("No available cabinets.");
       }
     }
-  
+
     return null;
   };
+
   const sendEmail = () => {
     const emailData = {
       to_name: formData.senderName,
@@ -218,38 +219,44 @@ const ParcelForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateAddresses()) {
-      alert("Address validation failed. Please check the addresses and try again.");
+      alert(
+        "Address validation failed. Please check the addresses and try again."
+      );
       return;
     }
-  
+
     // Use the city directly from the form data
     const senderCityFromForm = validateAddress(formData.senderAddress);
-  
+
     try {
       if (!senderCityFromForm) {
-        alert("Invalid sender city. Please check the sender address and try again.");
+        alert(
+          "Invalid sender city. Please check the sender address and try again."
+        );
         return;
       }
-  
+
       const cabinetDetails = await fetchAndFilterCabinets(senderCityFromForm);
       if (!cabinetDetails) {
-        alert("No available cabinets. Please wait until the cabinets are freed up.");
+        alert(
+          "No available cabinets. Please wait until the cabinets are freed up."
+        );
         return;
       }
-  
+
       // Update state with the fetched cabinet details
       setCabinetNumber(cabinetDetails.cabinetNumber);
       setAccessCode(cabinetDetails.accessCode);
       setCabinetId(cabinetDetails.cabinetId);
       console.log("Cabinet details:", cabinetDetails.accessCode);
-  
+
       const parcelId = await sendParcel();
       if (!parcelId) {
         throw new Error("Failed to send parcel data");
       }
-  
+
       await createTransaction(parcelId, cabinetDetails.cabinetId);
       sendEmail(); // Send cabinet information to the user
       alert("Parcel submission process completed successfully.");
@@ -258,8 +265,7 @@ const ParcelForm = () => {
       alert("There was an issue processing your request. Please try again.");
     }
   };
-  
-  
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="max-w-4xl m-4 bg-white shadow-2xl rounded-2xl">
