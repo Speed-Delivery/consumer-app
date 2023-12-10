@@ -142,7 +142,7 @@ const ParcelForm = () => {
   const fetchAndFilterCabinets = async (city) => {
     const cabinetsData = await fetchCabinets(city);
     let availableCabinets = [];
-
+  
     if (cabinetsData && cabinetsData.lockers) {
       cabinetsData.lockers.forEach((locker) => {
         let available = locker.cabinets.filter(
@@ -150,24 +150,25 @@ const ParcelForm = () => {
         );
         availableCabinets.push(...available);
       });
-
+  
       if (availableCabinets.length > 0) {
         const randomIndex = Math.floor(
           Math.random() * availableCabinets.length
         );
         const selectedCabinet = availableCabinets[randomIndex];
-        setCabinetNumber(selectedCabinet.cabinetNumber);
-        setAccessCode(selectedCabinet.code);
-        setCabinetId(selectedCabinet.id);
-        console.log("Available cabinets:", cabinetNumber, accessCode);
+        console.log("Selected cabinet:", selectedCabinet);
+        return {
+          cabinetNumber: selectedCabinet.cabinetNumber,
+          accessCode: selectedCabinet.code,
+          cabinetId: selectedCabinet.id
+        };
       } else {
         console.log("No available cabinets.");
       }
     }
-
-    return availableCabinets.length > 0 ? cabinetId : null;
+  
+    return null;
   };
-
   const sendEmail = () => {
     const emailData = {
       to_name: formData.senderName,
@@ -221,29 +222,30 @@ const ParcelForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!validateAddresses()) {
-      alert(
-        "Address validation failed. Please check the addresses and try again."
-      );
+      alert("Address validation failed. Please check the addresses and try again.");
       return;
     }
-
+  
     try {
-      const selectedCabinetId = await fetchAndFilterCabinets(senderCity);
-      if (!selectedCabinetId) {
-        alert(
-          "No available cabinets. Please wait until the cabinets are freed up."
-        );
+      const cabinetDetails = await fetchAndFilterCabinets(senderCity);
+      if (!cabinetDetails) {
+        alert("No available cabinets. Please wait until the cabinets are freed up.");
         return;
       }
-
+  
+      // Update state with the fetched cabinet details
+      setCabinetNumber(cabinetDetails.cabinetNumber);
+      setAccessCode(cabinetDetails.accessCode);
+      setCabinetId(cabinetDetails.cabinetId);
+      console.log("Cabinet details:", cabinetDetails.accessCode);
       const parcelId = await sendParcel();
       if (!parcelId) {
         throw new Error("Failed to send parcel data");
       }
-
-      await createTransaction(parcelId, selectedCabinetId);
+  
+      await createTransaction(parcelId, cabinetDetails.cabinetId);
       sendEmail(); // Send cabinet information to the user
       alert("Parcel submission process completed successfully.");
     } catch (error) {
@@ -251,7 +253,7 @@ const ParcelForm = () => {
       alert("There was an issue processing your request. Please try again.");
     }
   };
-
+  
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="max-w-4xl m-4 bg-white shadow-2xl rounded-2xl">
