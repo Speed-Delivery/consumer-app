@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import API_BASE_URL from "../apiConfig";
+import API_BASE_URL from "../../apiConfig";
 
 const ParcelHistory = () => {
   const { user } = useContext(UserContext);
