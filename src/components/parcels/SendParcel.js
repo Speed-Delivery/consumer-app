@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import emailjs from "@emailjs/browser";
+import API_BASE_URL from "../../apiConfig";
 
 //store  the sender and recipient city from the valiadateAddress function
 
@@ -67,7 +68,7 @@ const ParcelForm = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:5005/api/parcels", {
+      const response = await fetch(`${API_BASE_URL}/api/parcels`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +95,7 @@ const ParcelForm = () => {
   ) => {
     try {
       const transactionResponse = await fetch(
-        "http://localhost:5005/api/transactions",
+        `${API_BASE_URL}/api/transactions`,
         {
           method: "POST",
           headers: {
@@ -118,7 +119,7 @@ const ParcelForm = () => {
 
   const fetchCabinets = async (city) => {
     try {
-      const response = await fetch(`http://localhost:5005/api/lockers/${city}`);
+      const response = await fetch(`${API_BASE_URL}/api/lockers/${city}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

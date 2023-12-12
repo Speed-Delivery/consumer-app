@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
+import API_BASE_URL from '../../apiConfig';
 
 const EditUserProfile = () => {
   const { user, updateUser } = useContext(UserContext); 
@@ -36,7 +37,7 @@ const EditUserProfile = () => {
         const user = JSON.parse(userString);
         const token = user.token;
         console.log('Token:', token); // Debugging
-        const response = await fetch(`http://localhost:5005/api/users/${editUser.userId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/${editUser.userId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

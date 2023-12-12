@@ -1,5 +1,6 @@
 
 import React from 'react';
+import API_BASE_URL from '../../apiConfig';
 
 const AccountDeletion = () => {
   const handleAccountDeletion = async () => {
@@ -9,7 +10,7 @@ const AccountDeletion = () => {
       // get token
       const token = JSON.parse(localStorage.getItem('user')).token;
       console.log('Token:', token); // Debugging
-      const response = await fetch(`http://localhost:5005/api/users/${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
         method: 'DELETE', // Specify the DELETE method for the request
         headers: {
           'Content-Type': 'application/json',

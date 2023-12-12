@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import API_BASE_URL from "../../apiConfig";
 
 const LockerList = () => {
   const [lockers, setLockers] = useState([]);
@@ -16,7 +17,7 @@ const LockerList = () => {
   }, []);
 
   const fetchLockers = async () => {
-    const response = await fetch("http://localhost:5005/api/lockers");
+    const response = await fetch(`${API_BASE_URL}/api/lockers`);
     const data = await response.json();
     if (data && Array.isArray(data.lockers)) {
       setLockers(data.lockers);
@@ -96,7 +97,7 @@ const Locker = ({ cabinet, lockerId }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5005/api/lockers/${lockerId}`, // Use the locker ID
+        `${API_BASE_URL}/api/lockers/${lockerId}`, // Use the locker ID
         {
           method: "PUT",
           headers: {

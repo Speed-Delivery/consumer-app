@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
+import API_BASE_URL from "../apiConfig";
 
 const ParcelHistory = () => {
   const { user } = useContext(UserContext);
@@ -14,7 +15,7 @@ const ParcelHistory = () => {
 
   useEffect(() => {
     // Fetch parcels
-    fetch("http://localhost:5005/api/parcels")
+    fetch(`${API_BASE_URL}/api/parcels`)
       .then((response) => response.json())
       .then((result) => {
         if (result.parcels && Array.isArray(result.parcels)) {
@@ -26,7 +27,7 @@ const ParcelHistory = () => {
       .catch((error) => console.error("Error fetching parcels:", error));
 
     // Fetch transactions
-    fetch("http://localhost:5005/api/transactions")
+    fetch(`${API_BASE_URL}/api/transactions`)
       .then((response) => response.json())
       .then((result) => {
         if (result.transactions && Array.isArray(result.transactions)) {

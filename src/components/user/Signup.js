@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Import Link for navigation
 import { UserContext } from "../context/UserContext";
+import API_BASE_URL from "../../apiConfig";
 
 const Signup = () => {
   const { updateUser, setIsAuthenticated, setUser } = useContext(UserContext);
@@ -25,7 +26,7 @@ const Signup = () => {
   console.log("Before sending ", formData);
   const handleSignup = async () => {
     try {
-      const response = await fetch("http://localhost:5005/api/users", {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

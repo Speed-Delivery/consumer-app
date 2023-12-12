@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NotificationCard from "./NotificationCard"; // Import the component
+import API_BASE_URL from "../../apiConfig";
 
 const Notification = () => {
   const [parcels, setParcels] = useState([]);
@@ -17,7 +18,7 @@ const Notification = () => {
     const userId = JSON.parse(localStorage.getItem("user"))._id;
 
     // Step 2: Fetch parcels where the current user is the sender
-    fetch("http://localhost:5005/api/parcels")
+    fetch(`${API_BASE_URL}/api/parcels`)
       .then((response) => response.json())
       .then((result) => {
         if (result.parcels && Array.isArray(result.parcels)) {
@@ -36,7 +37,7 @@ const Notification = () => {
 
   useEffect(() => {
     // Step 3: Fetch all transactions
-    fetch("http://localhost:5005/api/transactions/")
+    fetch(`${API_BASE_URL}/api/transactions/`)
       .then((response) => response.json())
       .then((transactionData) => {
         console.log("Fetched transactions:", transactionData.transactions); // Add this line
@@ -57,7 +58,7 @@ const Notification = () => {
   }, [parcels]);
 
   const fetchLockers = async () => {
-    const response = await fetch("http://localhost:5005/api/lockers");
+    const response = await fetch(`${API_BASE_URL}/api/lockers`);
     const data = await response.json();
     if (data && Array.isArray(data.lockers)) {
       setLockers(data.lockers);
