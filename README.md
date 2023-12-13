@@ -1,70 +1,76 @@
-# Getting Started with Create React App
+# Consumer-App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Introduction
 
-## Available Scripts
+"Consumer-App" is a GUI application designed for consumers to manage their parcel deliveries efficiently and securely. Hosted on Azure Static Web Apps, this React-based app offers an intuitive interface for users to send, receive, and track parcels through a network of parcel lockers.
 
-In the project directory, you can run:
+Live App: [Consumer-App on Azure](https://brave-mushroom-05bf9d003.4.azurestaticapps.net)
 
-### `npm start`
+## Key Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### User Signup and Sign In
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **User Signup**: Enables new users to create an account with a username and password.
+- **User Sign In**: Secure authentication system to identify users based on their credentials.
 
-### `npm test`
+### Parcel Management
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Parcel Information and History**: Users can view detailed information and history of sent and received parcels, including sender/recipient details, pickup and drop-off timings, parcel status, and retrieval codes for lockers.
+- **Notifications**: Notification system alerts users about parcels ready for pickup.
 
-### `npm run build`
+### Account and Parcel Handling
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Account Deletion**: Users can delete their accounts while maintaining the integrity of parcel data in the system.
+- **Send New Parcel**: Functionality to send new parcels, including input fields for parcel dimensions, mass, recipient/sender details, and location selection from available parcel lockers.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### `npm run eject`
+### Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- [Node.js and npm](https://nodejs.org/en/download/)
+- [Git](https://git-scm.com/downloads)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Installing
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. **Clone and Navigate**:
+   ```bash
+   git clone https://github.com/Speed-Delivery/consumer-app.git
+   cd consumer-app
+   ```
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Run the Application**:
+   ```bash
+   npm start
+   ```
+   Access the app at [http://localhost:3000](http://localhost:3000).
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Deployment
 
-## Learn More
+Push your changes to the main branch to trigger the Azure Static Web Apps CI/CD pipeline for deployment.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Built With
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [React](https://reactjs.org/) - The web framework used
+- [Azure Static Web Apps](https://azure.microsoft.com/en-us/services/app-service/static/) - Hosting platform
 
-### Code Splitting
+## Authors
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **Mussa Muna**
+- **Nafisa Akter**
+- **Gebrehiwot Matusala**
+- **Mst Airen Aktar**
 
-### Analyzing the Bundle Size
+- See also the list of [contributors](https://github.com/Speed-Delivery/consumer-app/contributors).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## License
 
-### Making a Progressive Web App
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Acknowledgments
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- To All team members. Thank you for your hard work and dedication to this project.
